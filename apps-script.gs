@@ -280,7 +280,8 @@ function findExistingDateRowColor(sheet) {
   const datePattern = new RegExp('^(' + monthNames.join('|') + ')\\s+\\d{1,2}$', 'i');
 
   const data = sheet.getRange(1, 1, Math.min(lastRow, 500), 10).getValues();
-  for (let i = 0; i < data.length; i++) {
+  // Scan from BOTTOM up so the most recently customized row wins (e.g. user's bright-green).
+  for (let i = data.length - 1; i >= 0; i--) {
     for (const cellValue of data[i]) {
       if (datePattern.test(String(cellValue).trim())) {
         const bgs = sheet.getRange(i + 1, 1, 1, 10).getBackgrounds()[0];
@@ -321,9 +322,13 @@ function findOrCreateSection(sheet, dateLabel) {
 
   if (labelRow === -1) {
     const startAt = lastRow + 3;
-    const greenColor = findExistingDateRowColor(sheet) || '#b6d7a8';
-    sheet.getRange(startAt, 1, 1, 10).setBackground(greenColor);
-    sheet.getRange(startAt, COL.DATE_LABEL).setValue(dateLabel).setFontWeight('bold');
+    const greenColor = findExistingDateRowColor(sheet) || '#00ff00';
+    const dateRange = sheet.getRange(startAt, 1, 1, 10);
+    dateRange.merge();
+    dateRange.setValue(dateLabel)
+      .setBackground(greenColor)
+      .setFontWeight('bold')
+      .setHorizontalAlignment('center');
     const headerRow = startAt + 1;
     sheet.getRange(headerRow, COL.SNO, 1, HEADERS.length).setValues([HEADERS]);
     return { headerRow, nextWriteRow: headerRow + 1, maxSno: 0 };
