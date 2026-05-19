@@ -2,7 +2,9 @@
 
 import { useEffect, useState, useRef } from 'react';
 
-const SCRAMBLE_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&*';
+// Constrained char set: similar visual weight, no super-wide or super-thin glyphs.
+// Avoids letterspacing jitter as chars change.
+const SCRAMBLE_CHARS = 'abcdefghkmnopqrstuvwxyz';
 
 // Continuous-loop shuffle reveal: each character cycles through random chars
 // then locks in. After the full text is revealed, pauses and re-runs.
@@ -13,7 +15,7 @@ export default function ShuffleText({
   holdMs = 1800,       // pause once fully revealed before restarting
   className = '',
 }) {
-  const [display, setDisplay] = useState(() => randomString(text.length));
+  const [display, setDisplay] = useState(() => randomString(text.length, text));
   const timersRef = useRef([]);
 
   useEffect(() => {
@@ -35,7 +37,7 @@ export default function ShuffleText({
         if (cancelled) return;
         setDisplay((prev) => {
           const lockedSlice = text.slice(0, lockedCount);
-          const tail = randomString(text.length - lockedCount);
+          const tail = randomString(text.length - lockedCount, text.slice(lockedCount));
           return lockedSlice + tail;
         });
       }, scrambleMs);
@@ -48,7 +50,7 @@ export default function ShuffleText({
           lockedCount = i;
           setDisplay((prev) => {
             const lockedSlice = text.slice(0, lockedCount);
-            const tail = randomString(text.length - lockedCount);
+            const tail = randomString(text.length - lockedCount, text.slice(lockedCount));
             return lockedSlice + tail;
           });
           if (i === text.length) {
@@ -71,10 +73,16 @@ export default function ShuffleText({
   return <span className={className} aria-label={text}>{display}</span>;
 }
 
-function randomString(len) {
+function randomString(len, sourceText = '') {
   let s = '';
   for (let i = 0; i < len; i++) {
-    s += SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)];
+    // Preserve spaces and punctuation from the source position — only shuffle letters.
+    const sourceChar = sourceText[i];
+    if (sourceChar && /[^A-Za-z0-9]/.test(sourceChar)) {
+      s += sourceChar;
+    } else {
+      s += SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)];
+    }
   }
   return s;
 }

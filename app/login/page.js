@@ -40,7 +40,7 @@ export default function LoginPage() {
       <div className="login-card">
         <div className="login-emoji">👋</div>
         <h1 className="login-title">
-          <ShuffleText text="Welcome back, Aishwarya" revealMs={70} scrambleMs={28} holdMs={2200} />
+          <ShuffleText text="Welcome back, Aishwarya" revealMs={110} scrambleMs={90} holdMs={3000} />
         </h1>
         <p className="login-subtitle">Enter your password to continue.</p>
         <form className="login-form" onSubmit={handleSubmit}>
