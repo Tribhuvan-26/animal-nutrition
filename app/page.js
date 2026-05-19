@@ -115,13 +115,13 @@ export default function Home() {
                 })}
               </div>
             )}
-            {status.result?.dropdowns && (
-              <details style={{ marginTop: '1rem', fontSize: '0.8rem' }}>
-                <summary style={{ cursor: 'pointer', color: '#94a3b8' }}>Show dropdown options ({status.result.dropdowns.item?.values?.length || 0} items)</summary>
-                <div style={{ marginTop: '0.5rem', color: '#94a3b8', maxHeight: '200px', overflow: 'auto' }}>
-                  {status.result.dropdowns.item?.values?.join(', ')}
-                </div>
-              </details>
+            {status.result && (
+              <div style={{ marginTop: '0.75rem', fontSize: '0.75rem', color: '#94a3b8', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '0.5rem' }}>
+                <div>Sheets API enabled: <b style={{ color: status.result.sheetsAvailable ? '#86efac' : '#fca5a5' }}>{String(status.result.sheetsAvailable ?? '—')}</b></div>
+                <div>Chip template found: <b style={{ color: status.result.chipFound ? '#86efac' : '#fca5a5' }}>{String(status.result.chipFound ?? '—')}</b></div>
+                <div>API requests sent: <b>{status.result.apiRequestCount ?? '—'}</b> | applied: <b style={{ color: status.result.apiUsed ? '#86efac' : '#fca5a5' }}>{String(status.result.apiUsed ?? '—')}</b></div>
+                {status.result.apiError && <div style={{ color: '#fca5a5', wordBreak: 'break-word' }}>API error: {status.result.apiError}</div>}
+              </div>
             )}
           </div>
         )}

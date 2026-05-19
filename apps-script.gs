@@ -94,16 +94,30 @@ function doPost(e) {
 
     // Flush batched Sheets API validation requests.
     let apiUsed = false;
-    if (apiRequests.length > 0 && typeof Sheets !== 'undefined') {
+    let apiError = null;
+    const sheetsAvailable = typeof Sheets !== 'undefined';
+    if (apiRequests.length > 0 && sheetsAvailable) {
       try {
         Sheets.Spreadsheets.batchUpdate({ requests: apiRequests }, ss.getId());
         apiUsed = true;
       } catch (err) {
-        // Service not available or other issue - log but continue.
+        apiError = err.message || String(err);
       }
     }
 
-    return jsonOut({ success: true, dateLabel, rowsAdded: written.length, written, newItems, masterListSize: masterList.length, apiUsed, chipFound: !!chipValidationRule });
+    return jsonOut({
+      success: true,
+      dateLabel,
+      rowsAdded: written.length,
+      written,
+      newItems,
+      masterListSize: masterList.length,
+      apiUsed,
+      apiError,
+      sheetsAvailable,
+      chipFound: !!chipValidationRule,
+      apiRequestCount: apiRequests.length,
+    });
   } catch (err) {
     return jsonOut({ success: false, error: err.message, stack: err.stack });
   }
