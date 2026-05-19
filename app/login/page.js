@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import ShuffleText from '@/app/components/ShuffleText';
+import TextCursor from '@/app/components/TextCursor';
 
 export default function LoginPage() {
   const [password, setPassword] = useState('');
@@ -37,6 +38,7 @@ export default function LoginPage() {
 
   return (
     <main className="login-main">
+      <TextCursor emoji="💪" />
       <div className="login-card">
         <div className="login-emoji">👋</div>
         <h1 className="login-title">
