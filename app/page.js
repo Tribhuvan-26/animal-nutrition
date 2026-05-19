@@ -51,25 +51,40 @@ export default function Home() {
     }
   }
 
+  function clearFile() {
+    setFile(null);
+    setPreviewUrl(null);
+    if (inputRef.current) inputRef.current.value = '';
+  }
+
   return (
     <main>
-      <div className="card" style={{ maxWidth: 720 }}>
-        <h1>Sales Ledger to Sheet</h1>
-        <p className="subtitle">Upload a photo of the daily sales ledger. Compare what Gemini read vs what got written to the sheet.</p>
+      <div className="card">
+        <div className="header">
+          <div className="logo">📒</div>
+          <div>
+            <h1>Sales Ledger to Sheet</h1>
+            <p className="subtitle">Upload a daily ledger photo. Gemini reads it, rows fill in your Google Sheet.</p>
+          </div>
+        </div>
 
         <label
-          className={`dropzone ${dragging ? 'dragging' : ''}`}
+          className={`dropzone ${dragging ? 'dragging' : ''} ${previewUrl ? 'has-preview' : ''}`}
           onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
           onDragLeave={() => setDragging(false)}
           onDrop={onDrop}
         >
           {previewUrl ? (
-            <img src={previewUrl} alt="Ledger preview" className="preview" />
-          ) : (
             <>
-              <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📄</div>
-              <div>Click or drag a ledger photo here</div>
+              <img src={previewUrl} alt="Ledger preview" className="preview" />
+              <button type="button" className="clear-btn" onClick={(e) => { e.preventDefault(); clearFile(); }}>✕</button>
             </>
+          ) : (
+            <div className="drop-empty">
+              <div className="drop-icon">📄</div>
+              <div className="drop-title">Drop a ledger photo</div>
+              <div className="drop-hint">or click to browse</div>
+            </div>
           )}
           <input
             ref={inputRef}
@@ -79,13 +94,18 @@ export default function Home() {
           />
         </label>
 
-        <button onClick={onSubmit} disabled={!file || status?.type === 'loading'}>
-          {status?.type === 'loading' ? 'Working...' : 'Log to sheet'}
+        <button className="submit-btn" onClick={onSubmit} disabled={!file || status?.type === 'loading'}>
+          {status?.type === 'loading' ? (
+            <><span className="spinner" /> Working...</>
+          ) : (
+            <>Log to sheet →</>
+          )}
         </button>
 
         {status && (
           <div className={`status ${status.type}`}>
-            <div>{status.message}</div>
+            <div className="status-message">{status.message}</div>
+
             {status.result?.entries && (
               <div className="result-table">
                 <div className="result-header">
@@ -99,32 +119,42 @@ export default function Home() {
                 {status.result.entries.map((e, i) => {
                   const w = status.result.written?.[i];
                   const writtenItem = w?.item_written ?? '';
-                  const missing = e.items && writtenItem !== e.items;
                   return (
                     <div className="result-row-grid" key={i}>
-                      <span>{i + 1}</span>
-                      <span title={e.name}>{e.name}</span>
-                      <span title={e.items} style={{ color: '#94a3b8' }}>{e.items || '—'}</span>
-                      <span title={writtenItem} style={{ color: missing ? '#fca5a5' : '#86efac' }}>
-                        {writtenItem || '(blank)'}
-                      </span>
-                      <span>{e.amount}</span>
-                      <span>{e.paid_or_not || '—'}</span>
+                      <span className="rg-num">{i + 1}</span>
+                      <span className="rg-name" title={e.name}>{e.name}</span>
+                      <span className="rg-gemini" title={e.items}>{e.items || '—'}</span>
+                      <span className="rg-written" title={writtenItem}>{writtenItem || '(blank)'}</span>
+                      <span className="rg-amount">{e.amount}</span>
+                      <span className="rg-status">{e.paid_or_not || '—'}</span>
                     </div>
                   );
                 })}
               </div>
             )}
-            {status.result && (
-              <div style={{ marginTop: '0.75rem', fontSize: '0.75rem', color: '#94a3b8', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '0.5rem' }}>
-                <div>Sheets API enabled: <b style={{ color: status.result.sheetsAvailable ? '#86efac' : '#fca5a5' }}>{String(status.result.sheetsAvailable ?? '—')}</b></div>
-                <div>Chip template found: <b style={{ color: status.result.chipFound ? '#86efac' : '#fca5a5' }}>{String(status.result.chipFound ?? '—')}</b></div>
-                <div>API requests sent: <b>{status.result.apiRequestCount ?? '—'}</b> | applied: <b style={{ color: status.result.apiUsed ? '#86efac' : '#fca5a5' }}>{String(status.result.apiUsed ?? '—')}</b></div>
-                {status.result.apiError && <div style={{ color: '#fca5a5', wordBreak: 'break-word' }}>API error: {status.result.apiError}</div>}
+
+            {status.result && (status.result.sheetsAvailable !== undefined || status.result.chipFound !== undefined) && (
+              <div className="diagnostics">
+                <span className="diag-pill">
+                  Sheets API: <b className={status.result.sheetsAvailable ? 'ok' : 'bad'}>{status.result.sheetsAvailable ? 'on' : 'off'}</b>
+                </span>
+                <span className="diag-pill">
+                  Chip template: <b className={status.result.chipFound ? 'ok' : 'bad'}>{status.result.chipFound ? 'found' : 'missing'}</b>
+                </span>
+                <span className="diag-pill">
+                  API calls: <b>{status.result.apiRequestCount ?? 0}</b> · applied <b className={status.result.apiUsed ? 'ok' : 'bad'}>{status.result.apiUsed ? 'yes' : 'no'}</b>
+                </span>
+                {status.result.apiError && (
+                  <div className="diag-error">API error: {status.result.apiError}</div>
+                )}
               </div>
             )}
           </div>
         )}
+      </div>
+
+      <div className="footer">
+        Pushes to <a href="https://docs.google.com/spreadsheets/d/1hnrfkJXN8Irf3YbTt6h14vTWz72BnEJgN48LM9OdNDc/edit" target="_blank" rel="noreferrer">your Google Sheet</a> via Apps Script + Gemini 2.5 Flash
       </div>
     </main>
   );
