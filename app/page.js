@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import PhotoMasonry from '@/app/components/PhotoMasonry';
 
 export default function Home() {
   const [file, setFile] = useState(null);
@@ -67,7 +68,8 @@ export default function Home() {
 
   return (
     <main>
-      <div className="card">
+      <div className="card-overlay">
+        <div className="card">
         <div className="header">
           <div className="logo">📒</div>
           <div className="header-text">
@@ -161,6 +163,10 @@ export default function Home() {
           </div>
         )}
       </div>
+
+      </div>
+
+      <PhotoMasonry columns={4} repeat={6} />
 
       <div className="footer">
         Pushes to <a href="https://docs.google.com/spreadsheets/d/1hnrfkJXN8Irf3YbTt6h14vTWz72BnEJgN48LM9OdNDc/edit" target="_blank" rel="noreferrer">your Google Sheet</a> via Apps Script + Gemini 2.5 Flash
