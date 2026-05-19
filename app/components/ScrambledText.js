@@ -17,7 +17,13 @@ export default function ScrambledText({
   className = '',
 }) {
   const [chars, setChars] = useState(() =>
-    text.split('').map((c) => ({ target: c, display: c }))
+    text.split('').map((c) => ({
+      target: c,
+      // Start in fully scrambled state so the lock-in animation is visible from the first paint.
+      display: /[A-Za-z0-9]/.test(c)
+        ? SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)]
+        : c,
+    }))
   );
   const animatingRef = useRef(false);
 
