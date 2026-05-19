@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import ScrambledText from '@/app/components/ScrambledText';
 import TextCursor from '@/app/components/TextCursor';
 
 export default function LoginPage() {
@@ -40,10 +39,7 @@ export default function LoginPage() {
     <main className="login-main">
       <TextCursor emoji="💪" spacing={80} trailLength={6} fadeMs={900} size="2rem" />
       <div className="login-card">
-        <div className="login-emoji">👋</div>
-        <h1 className="login-title">
-          <ScrambledText text="Welcome back, Aishwarya" radius={110} speed={50} />
-        </h1>
+        <h1 className="login-title">Welcome back, Aishwarya</h1>
         <p className="login-subtitle">Enter your password to continue.</p>
         <form className="login-form" onSubmit={handleSubmit}>
           <div className="login-input-wrap">
