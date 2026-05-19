@@ -528,6 +528,7 @@ h1 {
 }
 
 .masonry {
+  column-count: var(--cols, 4);
   column-gap: 0.6rem;
   padding: 0.6rem;
 }
@@ -622,4 +623,149 @@ h1 {
 
 .footer a:hover {
   color: #c7d2fe;
+}
+
+/* ============================================
+   Mobile responsive overrides
+   ============================================ */
+
+@media (max-width: 768px) {
+  .masonry {
+    column-count: 3 !important;
+    column-gap: 0.4rem;
+    padding: 0.4rem;
+  }
+  .masonry-item {
+    margin-bottom: 0.4rem;
+    border-radius: 8px;
+  }
+
+  .card-overlay {
+    padding: 1rem 0.75rem;
+  }
+
+  .card {
+    padding: 1.25rem 1.25rem 1rem;
+    border-radius: 18px;
+  }
+
+  .header {
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .logo {
+    width: 40px;
+    height: 40px;
+    font-size: 1.5rem;
+    border-radius: 10px;
+  }
+
+  h1 {
+    font-size: 1.15rem;
+  }
+
+  .subtitle {
+    font-size: 0.78rem;
+  }
+
+  .logout-btn {
+    padding: 0.35rem 0.65rem;
+    font-size: 0.72rem;
+  }
+
+  .dropzone {
+    min-height: 140px;
+  }
+
+  .drop-icon {
+    font-size: 2rem;
+  }
+
+  .drop-title {
+    font-size: 0.9rem;
+  }
+
+  .submit-btn {
+    padding: 0.8rem;
+    font-size: 0.9rem;
+  }
+
+  /* Compact result table — hide Gemini column on mobile to fit */
+  .result-header, .result-row-grid {
+    grid-template-columns: 1.2rem 4.5rem 1fr 3rem 3.5rem;
+    gap: 0.3rem;
+    font-size: 0.72rem;
+  }
+  .result-header .rg-gemini-col,
+  .result-row-grid .rg-gemini {
+    display: none;
+  }
+
+  .diag-pill {
+    font-size: 0.62rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  /* Login page */
+  .login-card {
+    padding: 2.25rem 1.5rem 1.75rem;
+    max-width: calc(100vw - 1.5rem);
+    border-radius: 20px;
+  }
+
+  .login-emoji {
+    font-size: 2.5rem;
+  }
+
+  .login-title {
+    font-size: 1.35rem;
+  }
+
+  .login-subtitle {
+    font-size: 0.82rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .login-input,
+  .login-button {
+    padding: 0.8rem 0.9rem;
+    font-size: 0.9rem;
+  }
+
+  /* Reduce cursor emoji size on small screens */
+  .text-cursor-emoji {
+    font-size: 1.3rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .masonry {
+    column-count: 2 !important;
+  }
+
+  .card {
+    padding: 1rem 1rem 0.85rem;
+  }
+
+  .header h1 {
+    font-size: 1.05rem;
+  }
+
+  .subtitle {
+    font-size: 0.72rem;
+  }
+
+  /* Hide Gemini-read and amount/status separation gracefully */
+  .result-header, .result-row-grid {
+    grid-template-columns: 1rem 1fr 2.8rem 3rem;
+  }
+  .result-header > span:nth-child(3),
+  .result-row-grid > span:nth-child(3) {
+    display: none;
+  }
+
+  .footer {
+    font-size: 0.68rem;
+  }
 }

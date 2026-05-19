@@ -21,7 +21,7 @@ export default function PhotoMasonry({ columns = 4, repeat = 6 }) {
 
   return (
     <div className="masonry-bg">
-      <div className="masonry" style={{ columnCount: columns }}>
+      <div className="masonry" style={{ '--cols': columns }}>
         {items.map((src, i) => (
           <img
             key={`${src}-${i}`}
