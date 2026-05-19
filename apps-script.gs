@@ -262,14 +262,24 @@ function findBestMatch(value, allowed) {
 
 function findExistingDateRowColor(sheet) {
   const lastRow = sheet.getLastRow();
-  const colVals = sheet.getRange(1, COL.DATE_LABEL, Math.min(lastRow, 500), 1).getValues();
   const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const colVals = sheet.getRange(1, COL.DATE_LABEL, Math.min(lastRow, 500), 1).getValues();
+
   for (let i = 0; i < colVals.length; i++) {
     const v = String(colVals[i][0]).trim();
     if (!v) continue;
-    if (monthNames.some(m => v.startsWith(m))) {
-      const bg = sheet.getRange(i + 1, COL.DATE_LABEL).getBackground();
-      if (bg && bg !== '#ffffff' && bg !== '#000000') return bg;
+    // Match "January 1", "May 8" — date-rows, not "January 2026" month headers
+    const isDateRow = monthNames.some(m => new RegExp('^' + m + '\\s+\\d{1,2}$').test(v));
+    if (!isDateRow) continue;
+
+    const rowNum = i + 1;
+    // Scan every cell in the row, return first non-white/non-black background
+    const bgs = sheet.getRange(rowNum, 1, 1, 10).getBackgrounds()[0];
+    for (const bg of bgs) {
+      const c = String(bg || '').toLowerCase();
+      if (c && c !== '#ffffff' && c !== '#000000' && c !== '#fff' && c !== '#000') {
+        return c;
+      }
     }
   }
   return null;
