@@ -16,8 +16,9 @@ const PHOTOS = [
 
 // In-flow masonry that makes the page scrollable. The card overlays this
 // (see .card-overlay in globals.css) so photos are visible behind it.
-export default function PhotoMasonry({ columns = 4, repeat = 6 }) {
-  const items = Array.from({ length: repeat }).flatMap(() => PHOTOS);
+// Shuffles photos once per mount so the order varies and no two duplicates land adjacent.
+export default function PhotoMasonry({ columns = 4 }) {
+  const items = shuffle(PHOTOS);
 
   return (
     <div className="masonry-bg">
@@ -28,7 +29,7 @@ export default function PhotoMasonry({ columns = 4, repeat = 6 }) {
             src={src}
             alt=""
             className="masonry-item"
-            style={{ animationDelay: `${(i % 11) * 80}ms` }}
+            style={{ animationDelay: `${i * 80}ms` }}
             loading="lazy"
             draggable={false}
           />
@@ -36,4 +37,13 @@ export default function PhotoMasonry({ columns = 4, repeat = 6 }) {
       </div>
     </div>
   );
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
 }

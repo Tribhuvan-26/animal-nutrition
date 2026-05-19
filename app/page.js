@@ -166,7 +166,7 @@ export default function Home() {
 
       </div>
 
-      <PhotoMasonry columns={4} repeat={6} />
+      <PhotoMasonry columns={4} />
 
       <div className="footer">
         Pushes to <a href="https://docs.google.com/spreadsheets/d/1hnrfkJXN8Irf3YbTt6h14vTWz72BnEJgN48LM9OdNDc/edit" target="_blank" rel="noreferrer">your Google Sheet</a> via Apps Script + Gemini 2.5 Flash
