@@ -42,7 +42,7 @@ export default function LoginPage() {
       <div className="login-card">
         <div className="login-emoji">👋</div>
         <h1 className="login-title">
-          <ScrambledText text="Welcome back, Aishwarya" speed={45} charDuration={500} stagger={25} />
+          <ScrambledText text="Welcome back, Aishwarya" radius={110} speed={50} />
         </h1>
         <p className="login-subtitle">Enter your password to continue.</p>
         <form className="login-form" onSubmit={handleSubmit}>

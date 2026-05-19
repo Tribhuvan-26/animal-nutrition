@@ -2,82 +2,61 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-const SCRAMBLE_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!<>-_\\/[]{}—=+*^?#';
+const SCRAMBLE_CHARS = '!<>-_\\/[]{}—=+*^?#';
 
-// Per-character scrambled-text animation inspired by reactbits.dev/text-animations/scrambled-text.
-// Each letter scrambles independently with a random duration, then locks into place.
-// Re-runs on hover.
+// Reactive scrambled-text — letters within `radius` of the mouse cursor
+// scramble live, letters outside the radius render as their target glyph.
+// Inspired by reactbits.dev/text-animations/scrambled-text.
 export default function ScrambledText({
   text,
-  speed = 40,           // ms between scramble ticks per char
-  charDuration = 600,   // ms each character scrambles before locking
-  stagger = 30,         // ms delay between starting each char
-  triggerOnMount = true,
-  triggerOnHover = true,
+  radius = 110,    // px from cursor where scramble is active
+  speed = 50,      // ms between scramble updates
   className = '',
 }) {
-  const [chars, setChars] = useState(() =>
-    text.split('').map((c) => ({
-      target: c,
-      // Start in fully scrambled state so the lock-in animation is visible from the first paint.
-      display: /[A-Za-z0-9]/.test(c)
-        ? SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)]
-        : c,
-    }))
-  );
-  const animatingRef = useRef(false);
+  const charsRef = useRef([]);
+  const mouseRef = useRef({ x: -9999, y: -9999 });
+  const [display, setDisplay] = useState(() => text.split(''));
 
   useEffect(() => {
-    if (triggerOnMount) run();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [text]);
+    function onMove(e) {
+      mouseRef.current = { x: e.clientX, y: e.clientY };
+    }
+    window.addEventListener('mousemove', onMove);
+    return () => window.removeEventListener('mousemove', onMove);
+  }, []);
 
-  function run() {
-    if (animatingRef.current) return;
-    animatingRef.current = true;
-
-    const targets = text.split('');
-    const finishedRefs = new Array(targets.length).fill(false);
-
-    targets.forEach((target, i) => {
-      const isLetter = /[A-Za-z0-9]/.test(target);
-      if (!isLetter) {
-        finishedRefs[i] = true;
-        return;
-      }
-      const lockAt = Date.now() + i * stagger + charDuration + Math.random() * 200;
-      const ticker = setInterval(() => {
-        if (Date.now() >= lockAt) {
-          clearInterval(ticker);
-          finishedRefs[i] = true;
-          setChars((prev) => {
-            const next = [...prev];
-            next[i] = { ...next[i], display: target };
-            return next;
-          });
-          if (finishedRefs.every(Boolean)) animatingRef.current = false;
-          return;
-        }
-        setChars((prev) => {
-          const next = [...prev];
-          next[i] = {
-            ...next[i],
-            display: SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)],
-          };
-          return next;
-        });
-      }, speed);
-    });
-  }
+  useEffect(() => {
+    const tick = setInterval(() => {
+      setDisplay(
+        text.split('').map((c, i) => {
+          const el = charsRef.current[i];
+          if (!el || /\s/.test(c)) return c;
+          const rect = el.getBoundingClientRect();
+          const cx = rect.left + rect.width / 2;
+          const cy = rect.top + rect.height / 2;
+          const dx = mouseRef.current.x - cx;
+          const dy = mouseRef.current.y - cy;
+          const dist = Math.hypot(dx, dy);
+          if (dist < radius) {
+            return SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)];
+          }
+          return c;
+        })
+      );
+    }, speed);
+    return () => clearInterval(tick);
+  }, [text, radius, speed]);
 
   return (
-    <span
-      className={className}
-      aria-label={text}
-      onMouseEnter={triggerOnHover ? run : undefined}
-    >
-      {chars.map((c, i) => (
-        <span key={i} className="scrambled-char">{c.display}</span>
+    <span className={className} aria-label={text}>
+      {display.map((c, i) => (
+        <span
+          key={i}
+          ref={(el) => { charsRef.current[i] = el; }}
+          className="scrambled-char"
+        >
+          {c}
+        </span>
       ))}
     </span>
   );
