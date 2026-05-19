@@ -352,10 +352,10 @@ h1 {
   background: rgba(30, 41, 59, 0.75);
   backdrop-filter: blur(14px);
   border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 22px;
-  padding: 2.5rem 2rem 2rem;
+  border-radius: 24px;
+  padding: 3.25rem 2.75rem 2.75rem;
   width: 100%;
-  max-width: 380px;
+  max-width: 480px;
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.5);
   text-align: center;
 }
@@ -378,9 +378,9 @@ h1 {
 }
 
 .login-title {
-  font-size: 1.5rem;
+  font-size: 1.7rem;
   font-weight: 700;
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.5rem;
   background: linear-gradient(135deg, #f1f5f9 0%, #c7d2fe 100%);
   -webkit-background-clip: text;
   background-clip: text;
