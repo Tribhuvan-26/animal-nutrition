@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import ShuffleText from '@/app/components/ShuffleText';
 
 export default function LoginPage() {
   const [password, setPassword] = useState('');
@@ -38,7 +39,9 @@ export default function LoginPage() {
     <main className="login-main">
       <div className="login-card">
         <div className="login-emoji">👋</div>
-        <h1 className="login-title">Welcome back, Aishwarya</h1>
+        <h1 className="login-title">
+          <ShuffleText text="Welcome back, Aishwarya" revealMs={70} scrambleMs={28} holdMs={2200} />
+        </h1>
         <p className="login-subtitle">Enter your password to continue.</p>
         <form className="login-form" onSubmit={handleSubmit}>
           <div className="login-input-wrap">
