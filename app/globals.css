@@ -338,6 +338,39 @@ h1 {
   text-align: center;
 }
 
+.login-emoji {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+  animation: wave 1.8s ease-in-out infinite;
+  transform-origin: 70% 70%;
+  display: inline-block;
+}
+
+@keyframes wave {
+  0%, 60%, 100% { transform: rotate(0deg); }
+  10% { transform: rotate(14deg); }
+  20% { transform: rotate(-8deg); }
+  30% { transform: rotate(14deg); }
+  40% { transform: rotate(-4deg); }
+  50% { transform: rotate(10deg); }
+}
+
+.login-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+  background: linear-gradient(135deg, #f1f5f9 0%, #c7d2fe 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.login-subtitle {
+  color: #94a3b8;
+  font-size: 0.9rem;
+  margin-bottom: 1.75rem;
+}
+
 /* ---- Footer ---- */
 
 .footer {
