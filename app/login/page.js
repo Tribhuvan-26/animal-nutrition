@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -40,15 +41,25 @@ export default function LoginPage() {
         <h1 className="login-title">Welcome back, Aishwarya</h1>
         <p className="login-subtitle">Enter your password to continue.</p>
         <form className="login-form" onSubmit={handleSubmit}>
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            autoFocus
-            required
-            className="login-input"
-          />
+          <div className="login-input-wrap">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoFocus
+              required
+              className="login-input"
+            />
+            <button
+              type="button"
+              className="login-toggle"
+              onClick={() => setShowPassword((v) => !v)}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+            >
+              {showPassword ? '🙈' : '👁️'}
+            </button>
+          </div>
           {error && <div className="login-error">{error}</div>}
           <button type="submit" disabled={loading || !password} className="login-button">
             {loading ? 'Signing in...' : 'Sign in →'}
