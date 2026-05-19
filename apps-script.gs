@@ -277,22 +277,18 @@ function findBestMatch(value, allowed) {
 function findExistingDateRowColor(sheet) {
   const lastRow = sheet.getLastRow();
   const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  const colVals = sheet.getRange(1, COL.DATE_LABEL, Math.min(lastRow, 500), 1).getValues();
+  const datePattern = new RegExp('^(' + monthNames.join('|') + ')\\s+\\d{1,2}$', 'i');
 
-  for (let i = 0; i < colVals.length; i++) {
-    const v = String(colVals[i][0]).trim();
-    if (!v) continue;
-    // Match "January 1", "May 8" — date-rows, not "January 2026" month headers
-    const isDateRow = monthNames.some(m => new RegExp('^' + m + '\\s+\\d{1,2}$').test(v));
-    if (!isDateRow) continue;
-
-    const rowNum = i + 1;
-    // Scan every cell in the row, return first non-white/non-black background
-    const bgs = sheet.getRange(rowNum, 1, 1, 10).getBackgrounds()[0];
-    for (const bg of bgs) {
-      const c = String(bg || '').toLowerCase();
-      if (c && c !== '#ffffff' && c !== '#000000' && c !== '#fff' && c !== '#000') {
-        return c;
+  const data = sheet.getRange(1, 1, Math.min(lastRow, 500), 10).getValues();
+  for (let i = 0; i < data.length; i++) {
+    for (const cellValue of data[i]) {
+      if (datePattern.test(String(cellValue).trim())) {
+        const bgs = sheet.getRange(i + 1, 1, 1, 10).getBackgrounds()[0];
+        for (const bg of bgs) {
+          const c = String(bg || '').toLowerCase();
+          if (c && c !== '#ffffff' && c !== '#fff') return c;
+        }
+        break;
       }
     }
   }
@@ -309,14 +305,18 @@ function formatDateLabel(isoDate) {
 
 function findOrCreateSection(sheet, dateLabel) {
   const lastRow = Math.max(sheet.getLastRow(), 1);
-  const colVals = sheet.getRange(1, COL.DATE_LABEL, lastRow, 1).getValues();
+  const data = sheet.getRange(1, 1, lastRow, 10).getValues();
 
+  // Find existing date row by scanning ALL columns (handles merged cells / non-G placement)
   let labelRow = -1;
-  for (let i = 0; i < colVals.length; i++) {
-    if (String(colVals[i][0]).trim() === dateLabel) {
-      labelRow = i + 1;
-      break;
+  for (let i = 0; i < data.length; i++) {
+    for (const cellValue of data[i]) {
+      if (String(cellValue).trim().toLowerCase() === dateLabel.toLowerCase()) {
+        labelRow = i + 1;
+        break;
+      }
     }
+    if (labelRow !== -1) break;
   }
 
   if (labelRow === -1) {
