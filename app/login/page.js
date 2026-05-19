@@ -38,7 +38,7 @@ export default function LoginPage() {
 
   return (
     <main className="login-main">
-      <TextCursor emoji="💪" />
+      <TextCursor emoji="💪" spacing={80} trailLength={6} fadeMs={900} size="2rem" />
       <div className="login-card">
         <div className="login-emoji">👋</div>
         <h1 className="login-title">
