@@ -105,17 +105,41 @@ export async function POST(req) {
     const mimeType = file.type || 'image/jpeg';
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-2.5-flash',
-      generationConfig: { temperature: 0.1, responseMimeType: 'application/json' },
-    });
+    const config = { temperature: 0.1, responseMimeType: 'application/json' };
+    const modelCandidates = ['gemini-2.5-flash', 'gemini-flash-latest', 'gemini-2.5-flash-lite'];
 
-    const result = await model.generateContent([
-      { inlineData: { data: base64, mimeType } },
-      PROMPT,
-    ]);
+    let text = '';
+    let lastErr = null;
+    for (const modelName of modelCandidates) {
+      const model = genAI.getGenerativeModel({ model: modelName, generationConfig: config });
+      let success = false;
+      // Retry each model up to 3 times with backoff on 503
+      for (let attempt = 0; attempt < 3 && !success; attempt++) {
+        try {
+          const result = await model.generateContent([
+            { inlineData: { data: base64, mimeType } },
+            PROMPT,
+          ]);
+          text = result.response.text().trim();
+          success = true;
+        } catch (err) {
+          lastErr = err;
+          const msg = String(err.message || '');
+          // Retry on 503/overload; break out for other errors to try next model
+          if (msg.includes('503') || msg.includes('overload') || msg.includes('high demand')) {
+            await new Promise(r => setTimeout(r, 1500 * (attempt + 1)));
+            continue;
+          }
+          break;
+        }
+      }
+      if (success) break;
+    }
 
-    const text = result.response.text().trim();
+    if (!text) {
+      return json({ success: false, error: `All Gemini models overloaded or failed. Last error: ${lastErr?.message || 'unknown'}` }, 503);
+    }
+
     const cleaned = stripCodeFences(text);
 
     let parsed;
