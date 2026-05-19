@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
   const [file, setFile] = useState(null);
@@ -8,6 +9,13 @@ export default function Home() {
   const [status, setStatus] = useState(null);
   const [dragging, setDragging] = useState(false);
   const inputRef = useRef(null);
+  const router = useRouter();
+
+  async function handleLogout() {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    router.push('/login');
+    router.refresh();
+  }
 
   function handleFile(f) {
     if (!f) return;
