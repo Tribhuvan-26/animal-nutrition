@@ -70,10 +70,11 @@ export default function Home() {
       <div className="card">
         <div className="header">
           <div className="logo">📒</div>
-          <div>
+          <div className="header-text">
             <h1>Sales Ledger to Sheet</h1>
             <p className="subtitle">Upload a daily ledger photo. Gemini reads it, rows fill in your Google Sheet.</p>
           </div>
+          <button className="logout-btn" onClick={handleLogout} title="Sign out">Logout</button>
         </div>
 
         <label
