@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server';
-import { AUTH_COOKIE, AUTH_COOKIE_VALUE } from './app/auth/constants';
+
+// Inlined (Edge runtime is strict about cross-dir imports in Next 16 + Turbopack).
+const AUTH_COOKIE = 'aish_auth';
+const AUTH_COOKIE_VALUE = 'ok';
 
 export function middleware(req) {
   const { pathname } = req.nextUrl;
 
-  // Skip auth check for login page, auth API, static assets
   if (
     pathname.startsWith('/login') ||
     pathname.startsWith('/api/auth') ||
