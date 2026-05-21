@@ -21,6 +21,18 @@ function doGet(e) {
   if (action === 'resetMaster') {
     return jsonOut(resetMasterToCanonical());
   }
+  if (action === 'inspectRow') {
+    const r = Number(e.parameter.row);
+    if (!r || r < 1) return jsonOut({ error: 'Invalid row' });
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheet = ss.getSheets().filter(s => s.getName() !== MASTER_SHEET_NAME)[0];
+    const cellValue = sheet.getRange(r, COL.ITEM).getValue();
+    let dv = null;
+    if (typeof Sheets !== 'undefined') {
+      try { dv = readCellValidation(ss, sheet, r, COL.ITEM); } catch (err) { dv = { error: err.message }; }
+    }
+    return jsonOut({ row: r, col: 'D (item)', value: cellValue, dataValidation: dv });
+  }
   if (action === 'diagnostics') {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     const sheet = ss.getSheets().filter(s => s.getName() !== MASTER_SHEET_NAME)[0];
@@ -174,28 +186,42 @@ function doPost(e) {
 
 // ---- Sheets API: read raw validation rule from existing chip cell ----
 
+// Anchor rows the user has confirmed have a real multi-select chip dropdown.
+// These are checked first because they're more likely to contain the actual
+// multi-chip rule structure than rows auto-written by the script.
+const CHIP_ANCHOR_ROWS = [457, 458, 467];
+
 function readChipValidationViaApi(ss, sheet) {
   if (typeof Sheets === 'undefined') return null;
   try {
-    // Find a row in the item column whose value has a comma (multi-item).
     const lastRow = sheet.getLastRow();
-    let sourceRow = -1;
+    // First try the user-designated anchor rows (manual multi-chip cells).
+    for (const r of CHIP_ANCHOR_ROWS) {
+      if (r > lastRow) continue;
+      const dv = readCellValidation(ss, sheet, r, COL.ITEM);
+      if (dv) return dv;
+    }
+    // Fallback: scan for any comma-containing cell.
     for (let r = 1; r <= Math.min(lastRow, 300); r++) {
       const v = String(sheet.getRange(r, COL.ITEM).getValue()).trim();
-      if (v.includes(',')) { sourceRow = r; break; }
+      if (v.includes(',')) {
+        const dv = readCellValidation(ss, sheet, r, COL.ITEM);
+        if (dv) return dv;
+      }
     }
-    if (sourceRow === -1) return null;
-
-    const a1 = sheet.getName() + '!' + columnToLetter(COL.ITEM) + sourceRow + ':' + columnToLetter(COL.ITEM) + sourceRow;
-    const resp = Sheets.Spreadsheets.get(ss.getId(), {
-      ranges: [a1],
-      fields: 'sheets/data/rowData/values/dataValidation',
-    });
-    const dv = resp.sheets?.[0]?.data?.[0]?.rowData?.[0]?.values?.[0]?.dataValidation;
-    return dv || null;
+    return null;
   } catch (err) {
     return null;
   }
+}
+
+function readCellValidation(ss, sheet, row, col) {
+  const a1 = sheet.getName() + '!' + columnToLetter(col) + row + ':' + columnToLetter(col) + row;
+  const resp = Sheets.Spreadsheets.get(ss.getId(), {
+    ranges: [a1],
+    fields: 'sheets/data/rowData/values/dataValidation',
+  });
+  return resp.sheets?.[0]?.data?.[0]?.rowData?.[0]?.values?.[0]?.dataValidation || null;
 }
 
 function buildSetValidationRequest(sheetId, row, col, rule) {
