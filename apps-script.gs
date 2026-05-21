@@ -88,31 +88,47 @@ function doPost(e) {
       sheet.getRange(row, COL.SNO).setValue(maxSno);
       sheet.getRange(row, COL.NAME).setValue(entry.name || '');
 
+      sheet.getRange(row, COL.SNO).setHorizontalAlignment('right');
+      sheet.getRange(row, COL.NAME).setHorizontalAlignment('left');
+
       const itemCell = sheet.getRange(row, COL.ITEM);
       itemCell.clearDataValidations(); // Clear strict validation FIRST so setValue accepts comma-separated values
       itemCell.setValue(itemValue);
+      itemCell.setHorizontalAlignment('left');
+      // ALWAYS apply a range-based dropdown so the arrow shows up reliably
+      // (even if the Sheets API chip request fails or is single-select strict).
+      applyRangeDropdown(itemCell, masterSheet);
+      // Best-effort: also queue the chip rule via Sheets API — overrides above if it succeeds
+      // and is a real multi-select chip.
       if (chipValidationRule) {
         apiRequests.push(buildSetValidationRequest(sheet.getSheetId(), row, COL.ITEM, chipValidationRule));
-      } else if (!String(itemValue).includes(',')) {
-        applyRangeDropdown(itemCell, masterSheet);
       }
 
       const amount = toNumber(entry.amount);
-      sheet.getRange(row, COL.AMOUNT).setValue(amount);
+      const amountCell = sheet.getRange(row, COL.AMOUNT);
+      amountCell.setValue(amount);
+      amountCell.setHorizontalAlignment('right');
 
       const paidCell = sheet.getRange(row, COL.PAID);
       paidCell.clearDataValidations();
       paidCell.setValue(paidValue);
+      paidCell.setHorizontalAlignment('left');
       applyListDropdown(paidCell, paidDropdown.values);
 
-      sheet.getRange(row, COL.MODE).setValue(entry.mode_of_payment || '');
+      const modeCell = sheet.getRange(row, COL.MODE);
+      modeCell.setValue(entry.mode_of_payment || '');
+      modeCell.setHorizontalAlignment('left');
 
       // Price + profit lookup from historical single-item rows.
       const priceInfo = lookupTotalPrice(finalParts, priceLookup);
       if (priceInfo.total !== null) {
-        sheet.getRange(row, COL.PRICE).setValue(priceInfo.total);
+        const priceCell = sheet.getRange(row, COL.PRICE);
+        priceCell.setValue(priceInfo.total);
+        priceCell.setHorizontalAlignment('right');
         if (typeof amount === 'number') {
-          sheet.getRange(row, COL.P).setValue(amount - priceInfo.total);
+          const pCell = sheet.getRange(row, COL.P);
+          pCell.setValue(amount - priceInfo.total);
+          pCell.setHorizontalAlignment('right');
         }
       }
 
@@ -435,7 +451,18 @@ function findOrCreateSection(sheet, dateLabel) {
       .setFontWeight('bold')
       .setHorizontalAlignment('center');
     const headerRow = startAt + 1;
-    sheet.getRange(headerRow, COL.SNO, 1, HEADERS.length).setValues([HEADERS]);
+    const headerRange = sheet.getRange(headerRow, COL.SNO, 1, HEADERS.length);
+    headerRange.setValues([HEADERS]);
+    headerRange.setFontWeight('bold');
+    // Align each header to match its data column type.
+    sheet.getRange(headerRow, COL.SNO).setHorizontalAlignment('right');
+    sheet.getRange(headerRow, COL.NAME).setHorizontalAlignment('left');
+    sheet.getRange(headerRow, COL.ITEM).setHorizontalAlignment('left');
+    sheet.getRange(headerRow, COL.AMOUNT).setHorizontalAlignment('right');
+    sheet.getRange(headerRow, COL.PAID).setHorizontalAlignment('left');
+    sheet.getRange(headerRow, COL.MODE).setHorizontalAlignment('left');
+    sheet.getRange(headerRow, COL.PRICE).setHorizontalAlignment('right');
+    sheet.getRange(headerRow, COL.P).setHorizontalAlignment('right');
     return { headerRow, nextWriteRow: headerRow + 1, maxSno: 0 };
   }
 
