@@ -27,11 +27,19 @@ function doGet(e) {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     const sheet = ss.getSheets().filter(s => s.getName() !== MASTER_SHEET_NAME)[0];
     const cellValue = sheet.getRange(r, COL.ITEM).getValue();
-    let dv = null;
+    let cellData = null;
     if (typeof Sheets !== 'undefined') {
-      try { dv = readCellValidation(ss, sheet, r, COL.ITEM); } catch (err) { dv = { error: err.message }; }
+      try {
+        const a1 = sheet.getName() + '!' + columnToLetter(COL.ITEM) + r + ':' + columnToLetter(COL.ITEM) + r;
+        // Pull ALL cell fields to look for chipRuns / multi-select metadata
+        const resp = Sheets.Spreadsheets.get(ss.getId(), {
+          ranges: [a1],
+          includeGridData: true,
+        });
+        cellData = resp.sheets?.[0]?.data?.[0]?.rowData?.[0]?.values?.[0] || null;
+      } catch (err) { cellData = { error: err.message }; }
     }
-    return jsonOut({ row: r, col: 'D (item)', value: cellValue, dataValidation: dv });
+    return jsonOut({ row: r, col: 'D (item)', value: cellValue, cellData });
   }
   if (action === 'diagnostics') {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -65,16 +73,12 @@ function doPost(e) {
     const masterSheet = getOrCreateMasterSheet();
     let masterList = getMasterList(masterSheet);
     const paidDropdown = inspectPaidDropdown();
-    const priceLookup = buildPriceLookup(sheet);
 
     let { headerRow, nextWriteRow, maxSno } = findOrCreateSection(sheet, dateLabel);
 
-    // Read raw validation rules (with multi-select metadata) from existing chip cells.
-    const chipValidationRule = readChipValidationViaApi(ss, sheet);
-
     const written = [];
     const newItems = [];
-    const apiRequests = [];
+    const apiRequests = []; // kept for response shape; no longer populated
 
     for (const entry of payload.entries) {
       maxSno += 1;
@@ -103,18 +107,11 @@ function doPost(e) {
       sheet.getRange(row, COL.SNO).setHorizontalAlignment('right');
       sheet.getRange(row, COL.NAME).setHorizontalAlignment('left');
 
+      // Item cell: plain text only — NO dropdown validation.
       const itemCell = sheet.getRange(row, COL.ITEM);
-      itemCell.clearDataValidations(); // Clear strict validation FIRST so setValue accepts comma-separated values
+      itemCell.clearDataValidations();
       itemCell.setValue(itemValue);
       itemCell.setHorizontalAlignment('left');
-      // ALWAYS apply a range-based dropdown so the arrow shows up reliably
-      // (even if the Sheets API chip request fails or is single-select strict).
-      applyRangeDropdown(itemCell, masterSheet);
-      // Best-effort: also queue the chip rule via Sheets API — overrides above if it succeeds
-      // and is a real multi-select chip.
-      if (chipValidationRule) {
-        apiRequests.push(buildSetValidationRequest(sheet.getSheetId(), row, COL.ITEM, chipValidationRule));
-      }
 
       const amount = toNumber(entry.amount);
       const amountCell = sheet.getRange(row, COL.AMOUNT);
@@ -131,24 +128,11 @@ function doPost(e) {
       modeCell.setValue(entry.mode_of_payment || '');
       modeCell.setHorizontalAlignment('left');
 
-      // Price + profit lookup from historical single-item rows.
-      const priceInfo = lookupTotalPrice(finalParts, priceLookup);
-      if (priceInfo.total !== null) {
-        const priceCell = sheet.getRange(row, COL.PRICE);
-        priceCell.setValue(priceInfo.total);
-        priceCell.setHorizontalAlignment('right');
-        if (typeof amount === 'number') {
-          const pCell = sheet.getRange(row, COL.P);
-          pCell.setValue(amount - priceInfo.total);
-          pCell.setHorizontalAlignment('right');
-        }
-      }
+      // price (H) and p (I) intentionally left blank — user fills in manually.
 
       written.push({
         row, sno: maxSno, name: entry.name,
         item_written: itemValue, paid_written: paidValue,
-        price_written: priceInfo.total,
-        price_missing: priceInfo.missing,
       });
       nextWriteRow += 1;
     }
