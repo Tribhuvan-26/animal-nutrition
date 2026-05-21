@@ -18,6 +18,23 @@ function doGet(e) {
       paid_or_not: inspectPaidDropdown(),
     });
   }
+  if (action === 'resetMaster') {
+    return jsonOut(resetMasterToCanonical());
+  }
+  if (action === 'diagnostics') {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheet = ss.getSheets().filter(s => s.getName() !== MASTER_SHEET_NAME)[0];
+    const chipRule = readChipValidationViaApi(ss, sheet);
+    const priceLookup = buildPriceLookup(sheet);
+    return jsonOut({
+      sheetsApiAvailable: typeof Sheets !== 'undefined',
+      chipTemplate: chipRule ? 'found' : 'missing',
+      chipRule: chipRule,
+      masterListSize: getMasterList(getOrCreateMasterSheet()).length,
+      priceLookupSize: Object.keys(priceLookup).length,
+      sampleLookup: Object.entries(priceLookup).slice(0, 5).map(([k, v]) => `${k}: ${v}`),
+    });
+  }
   return ContentService.createTextOutput('Sales ledger logger alive.').setMimeType(ContentService.MimeType.TEXT);
 }
 
@@ -36,6 +53,7 @@ function doPost(e) {
     const masterSheet = getOrCreateMasterSheet();
     let masterList = getMasterList(masterSheet);
     const paidDropdown = inspectPaidDropdown();
+    const priceLookup = buildPriceLookup(sheet);
 
     let { headerRow, nextWriteRow, maxSno } = findOrCreateSection(sheet, dateLabel);
 
@@ -57,8 +75,8 @@ function doPost(e) {
         if (matched) {
           finalParts.push(matched);
         } else {
-          masterSheet.appendRow([p]);
-          masterList.push(p);
+          // Strict 80+ list: do NOT auto-add to master. Write as-is so it's visible,
+          // but the cell will show an invalid warning so user can fix via dropdown.
           newItems.push(p);
           finalParts.push(p);
         }
@@ -79,7 +97,8 @@ function doPost(e) {
         applyRangeDropdown(itemCell, masterSheet);
       }
 
-      sheet.getRange(row, COL.AMOUNT).setValue(toNumber(entry.amount));
+      const amount = toNumber(entry.amount);
+      sheet.getRange(row, COL.AMOUNT).setValue(amount);
 
       const paidCell = sheet.getRange(row, COL.PAID);
       paidCell.clearDataValidations();
@@ -88,7 +107,21 @@ function doPost(e) {
 
       sheet.getRange(row, COL.MODE).setValue(entry.mode_of_payment || '');
 
-      written.push({ row, sno: maxSno, name: entry.name, item_written: itemValue, paid_written: paidValue });
+      // Price + profit lookup from historical single-item rows.
+      const priceInfo = lookupTotalPrice(finalParts, priceLookup);
+      if (priceInfo.total !== null) {
+        sheet.getRange(row, COL.PRICE).setValue(priceInfo.total);
+        if (typeof amount === 'number') {
+          sheet.getRange(row, COL.P).setValue(amount - priceInfo.total);
+        }
+      }
+
+      written.push({
+        row, sno: maxSno, name: entry.name,
+        item_written: itemValue, paid_written: paidValue,
+        price_written: priceInfo.total,
+        price_missing: priceInfo.missing,
+      });
       nextWriteRow += 1;
     }
 
@@ -191,6 +224,36 @@ function getOrCreateMasterSheet() {
   return sheet;
 }
 
+// Resets the _dropdown_items sheet to the canonical 79 original items.
+// Removes anything that was auto-added during earlier tests.
+function resetMasterToCanonical() {
+  const CANONICAL = [
+    'whey 2kg','Isolate 2kg','whey 1kg','megamass 3kg','Liver x','megamass 5kg',
+    'gainer 3kg','gainer 5kg','carbobooster 3kg','psycotic','peanut butter',
+    'wellcore creatine','abn creatine','abn glutamine','abn BCAA','MT Creatine',
+    'MT Fish oil','MT Glutamine','MT multivitamin','megamass 1kg','gainer 1kg',
+    'c4 60','Iso 100','pro antium','isopure 1kg','lipo 6 hers','mt eaa',
+    'l carnitine','nitrotech whey','abn testo','best bcaa','total war','curse pre',
+    'nitrotech ripped','xtend bcaa','masstech','isopure 2kgs','xpel','lipo 6 black',
+    'nitrawhey os','methyldrene','black spyder','nitraflex','cla + carnitine',
+    'testrol fire','on creatine','shilajit gold','syntha6','hyde','bioquest fishoil',
+    'nutrex cla','black viper','gnc eaa','abn multi vitamin','iso sensation',
+    'shilajit gummies','kl anabolic mass','rule 1 isolate','on gold 5lb','on gold 1kg',
+    'rule1 whey','qnt whey','dynamtize elite whey','xtend eaa','nitotech whey gold',
+    'kl levro whey','kl shaboom pre','nitra whey','rule 1 mass gainer','c4 50',
+    'rc king whey','isopure creatine','bioquest omega','tan cream','peanut butter 1 kg',
+    'rice cake','peanut butter 500 gms','oats 1kg','xl purge pre',
+  ];
+  const masterSheet = getOrCreateMasterSheet();
+  const beforeSize = getMasterList(masterSheet).length;
+  // Clear all rows then write canonical list.
+  if (masterSheet.getLastRow() > 0) {
+    masterSheet.getRange(1, 1, masterSheet.getLastRow(), 1).clearContent();
+  }
+  masterSheet.getRange(1, 1, CANONICAL.length, 1).setValues(CANONICAL.map(v => [v]));
+  return { success: true, before: beforeSize, after: CANONICAL.length };
+}
+
 function getMasterList(masterSheet) {
   const lastRow = masterSheet.getLastRow();
   if (lastRow === 0) return [];
@@ -270,6 +333,48 @@ function findBestMatch(value, allowed) {
     if (v.includes(String(a).toLowerCase())) return a;
   }
   return null;
+}
+
+// ---- Cost-price lookup from historical single-item rows ----
+
+function buildPriceLookup(sheet) {
+  const lookup = {};
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) return lookup;
+
+  const items = sheet.getRange(1, COL.ITEM, lastRow, 1).getValues();
+  const prices = sheet.getRange(1, COL.PRICE, lastRow, 1).getValues();
+
+  for (let i = 0; i < items.length; i++) {
+    const itemStr = String(items[i][0] || '').trim();
+    const price = Number(prices[i][0]);
+    if (!itemStr || !price || isNaN(price)) continue;
+    if (itemStr.includes(',')) continue; // only single-item rows give us a clean per-item price
+    const key = itemStr.toLowerCase();
+    lookup[key] = price; // overwrites with latest seen
+  }
+  return lookup;
+}
+
+function lookupTotalPrice(parts, priceLookup) {
+  if (!parts || parts.length === 0) return { total: null, missing: [] };
+  let total = 0;
+  let matchedAny = false;
+  const missing = [];
+  for (const p of parts) {
+    const price = priceLookup[String(p).toLowerCase()];
+    if (price === undefined) {
+      missing.push(p);
+    } else {
+      total += price;
+      matchedAny = true;
+    }
+  }
+  if (!matchedAny) return { total: null, missing };
+  // If some items are missing prices, we still return the partial total but flag missing.
+  // Caller can decide whether to use partial or leave blank.
+  if (missing.length > 0) return { total: null, missing }; // strict: only fill when all items have a price
+  return { total, missing };
 }
 
 // ---- Section management ----
