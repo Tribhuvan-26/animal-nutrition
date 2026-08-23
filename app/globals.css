@@ -589,6 +589,16 @@ h1 {
 }
 
 /* Fixed-overlay card so it stays in viewport while photos scroll behind it */
+/* Dim to focus: the photo wall stays visible but is pushed back so the
+   task surface reads. Scrim sits under the card, over the masonry. */
+.card-overlay::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(6, 10, 20, 0.72) 0%, rgba(6, 10, 20, 0.45) 55%, rgba(6, 10, 20, 0.22) 100%);
+  pointer-events: none;
+}
+
 .card-overlay {
   position: fixed;
   inset: 0;
@@ -602,6 +612,7 @@ h1 {
 }
 
 .card-overlay > .card {
+  position: relative;
   pointer-events: auto;
   max-height: calc(100vh - 4rem);
   overflow-y: auto;
