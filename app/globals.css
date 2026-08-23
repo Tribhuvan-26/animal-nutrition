@@ -88,6 +88,11 @@ main {
   transition: all 0.2s ease;
 }
 
+.logout-btn:active {
+  transform: scale(0.96);
+  transition: transform var(--press);
+}
+
 .logout-btn:hover {
   background: rgba(239, 68, 68, 0.2);
   border-color: rgba(239, 68, 68, 0.4);
@@ -240,8 +245,11 @@ h1 {
   box-shadow: 0 12px 24px rgba(99, 102, 241, 0.35);
 }
 
+/* Feedback on press, not on release. */
 .submit-btn:active:not(:disabled) {
-  transform: translateY(0);
+  transform: scale(0.975);
+  transition: transform var(--press);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }
 
 .submit-btn:disabled {
