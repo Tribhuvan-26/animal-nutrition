@@ -106,17 +106,18 @@ main {
 }
 
 h1 {
-  font-size: 1.4rem;
-  line-height: 1.2;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  margin-bottom: 0.2rem;
+  font-size: clamp(1.25rem, 2.6vw, 1.6rem);
+  line-height: 1.1;          /* tight leading for large text */
+  font-weight: 650;
+  letter-spacing: -0.021em;  /* negative tracking as it grows */
+  margin-bottom: 0.25rem;
 }
 
 .subtitle {
-  color: #94a3b8;
-  font-size: 0.85rem;
-  line-height: 1.4;
+  color: var(--ink-dim);
+  font-size: 0.875rem;
+  line-height: 1.45;
+  letter-spacing: 0.005em;   /* small text: slightly open, for legibility over glass */
 }
 
 /* ---- Dropzone ---- */
