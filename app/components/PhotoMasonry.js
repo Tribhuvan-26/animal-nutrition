@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+
 const PHOTOS = [
   '/photos/photo1.jpg',
   '/photos/photo2.jpg',
@@ -18,7 +20,10 @@ const PHOTOS = [
 // (see .card-overlay in globals.css) so photos are visible behind it.
 // Shuffles photos once per mount so the order varies and no two duplicates land adjacent.
 export default function PhotoMasonry({ columns = 4 }) {
-  const items = shuffle(PHOTOS);
+  // Shuffle after mount, not during render: Math.random() at render time makes the
+  // server and client pick different orders, which is a hydration mismatch.
+  const [items, setItems] = useState(PHOTOS);
+  useEffect(() => setItems(shuffle(PHOTOS)), []);
 
   return (
     <div className="masonry-bg">
