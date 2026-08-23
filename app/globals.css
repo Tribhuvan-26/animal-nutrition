@@ -124,10 +124,10 @@ h1 {
 
 .dropzone {
   position: relative;
-  border: 2px dashed #475569;
-  border-radius: 14px;
+  border: 1.5px dashed #4a5a71;
+  border-radius: 16px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: border-color var(--press), background var(--press), transform var(--settle);
   margin-bottom: 1rem;
   min-height: 180px;
   display: flex;
@@ -141,10 +141,17 @@ h1 {
   background: rgba(99, 102, 241, 0.05);
 }
 
+/* Hint toward the outcome: the well grows toward the incoming file. */
 .dropzone.dragging {
-  border-color: #8b5cf6;
-  background: rgba(139, 92, 246, 0.08);
-  transform: scale(1.005);
+  border-color: var(--accent-2);
+  border-style: solid;
+  background: rgba(139, 92, 246, 0.1);
+  transform: scale(1.015);
+}
+
+.dropzone:active {
+  transform: scale(0.995);
+  transition: transform var(--press);
 }
 
 .dropzone.has-preview {
@@ -175,7 +182,7 @@ h1 {
 
 .drop-hint {
   font-size: 0.8rem;
-  color: #94a3b8;
+  color: var(--ink-dim);
 }
 
 .preview {
