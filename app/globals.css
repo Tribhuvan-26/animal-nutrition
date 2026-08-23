@@ -576,19 +576,21 @@ h1 {
 }
 
 .login-title {
-  font-size: 1.7rem;
-  font-weight: 700;
+  font-size: clamp(1.9rem, 5vw, 2.4rem);
+  line-height: 1.08;
+  font-weight: 650;
+  letter-spacing: -0.025em;
   margin-bottom: 0.5rem;
-  background: linear-gradient(135deg, #f1f5f9 0%, #c7d2fe 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  /* Solid ink, not clipped-gradient text: per-char filter animation in BlurText
+     creates stacking contexts that drop out of background-clip: text. */
+  color: #eef2ff;
+  text-shadow: 0 1px 24px rgba(99, 102, 241, 0.28);
 }
 
 .login-subtitle {
-  color: #94a3b8;
-  font-size: 0.9rem;
-  margin-bottom: 1.75rem;
+  color: var(--ink-dim);
+  font-size: 0.875rem;
+  margin-bottom: 1.5rem;
 }
 
 .login-form {
@@ -625,7 +627,18 @@ h1 {
 }
 
 .login-input-wrap .login-input {
-  padding-right: 2.75rem;
+  padding-left: 2.6rem;
+  padding-right: 4.2rem;
+}
+
+.login-lock {
+  position: absolute;
+  left: 0.9rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.85rem;
+  opacity: 0.65;
+  pointer-events: none;
 }
 
 .login-toggle {
@@ -669,8 +682,26 @@ h1 {
   box-shadow: 0 12px 24px rgba(99, 102, 241, 0.35);
 }
 
+.login-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  letter-spacing: 0.005em;
+}
+
+/* Hint in the direction of the gesture. */
+.login-arrow {
+  transition: transform var(--settle);
+}
+
+.login-button:hover:not(:disabled) .login-arrow {
+  transform: translateX(3px);
+}
+
 .login-button:active:not(:disabled) {
-  transform: translateY(0);
+  transform: scale(0.975);
+  transition: transform var(--press);
 }
 
 .login-button:disabled {
