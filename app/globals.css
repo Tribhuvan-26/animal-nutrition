@@ -454,23 +454,113 @@ h1 {
   display: grid;
   place-items: center;
   padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Depth by distance: the photo wall is blurred, desaturated and dimmed so it
+   reads as a far layer, never as content. Scrim on top of it, card above that. */
+.login-bg {
+  position: fixed;
+  inset: -6%;
+  z-index: 0;
+  pointer-events: none;
+  filter: blur(9px) saturate(1.05) brightness(0.72);
+  transform: scale(1.08);
+  opacity: 1;
+  animation: bgDrift 40s ease-in-out infinite alternate;
+}
+
+.login-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* Vignette, not a blackout: darkest at the edges, photos still visible behind
+     the card. The card's own glass does the legibility work. */
+  background:
+    radial-gradient(ellipse 60% 55% at 50% 45%, rgba(6, 10, 20, 0.34) 0%, rgba(6, 10, 20, 0.62) 55%, rgba(6, 10, 20, 0.9) 100%),
+    linear-gradient(180deg, rgba(8, 12, 24, 0.35) 0%, rgba(8, 12, 24, 0.15) 40%, rgba(8, 12, 24, 0.5) 100%);
+}
+
+/* Slow, low-amplitude only â€” no vestibular pumping. */
+@keyframes bgDrift {
+  from { transform: scale(1.08) translate3d(0, 0, 0); }
+  to   { transform: scale(1.12) translate3d(-1.5%, -1.5%, 0); }
 }
 
 .login-card {
-  background: rgba(30, 41, 59, 0.75);
-  backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  position: relative;
+  z-index: 4;
+  background: var(--glass);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  border: 1px solid var(--hairline);
   border-radius: 26px;
-  padding: 3.75rem 3.25rem 3.25rem;
+  animation: materialize var(--settle) both;
+  overflow: hidden;
+  padding: 2.25rem 2.25rem 1.75rem;
   width: 100%;
-  max-width: 560px;
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.5);
+  max-width: 420px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.16);
   text-align: center;
 }
 
+/* Light catching the top edge of the glass. */
+.login-card::before {
+  content: "";
+  position: absolute;
+  top: -55%;
+  left: 50%;
+  width: 130%;
+  height: 110%;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse at center, rgba(99, 102, 241, 0.24) 0%, transparent 62%);
+  pointer-events: none;
+}
+
+/* Gradient hairline: brighter where the light would hit, fading down the sides. */
+.login-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.04) 38%, rgba(139, 92, 246, 0.28));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask-composite: exclude;
+  pointer-events: none;
+}
+
+.login-card > * {
+  position: relative;
+}
+
+.login-badge {
+  width: 62px;
+  height: 62px;
+  margin: 0 auto 1rem;
+  border-radius: 20px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(150deg, rgba(129, 140, 248, 0.3), rgba(168, 85, 247, 0.18));
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 10px 26px rgba(79, 70, 229, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+.login-eyebrow {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: #a5b4fc;
+  margin-bottom: 0.35rem;
+}
+
 .login-emoji {
-  font-size: 3rem;
-  margin-bottom: 0.5rem;
+  font-size: 2rem;
+  line-height: 1;
   animation: wave 1.8s ease-in-out infinite;
   transform-origin: 70% 70%;
   display: inline-block;
