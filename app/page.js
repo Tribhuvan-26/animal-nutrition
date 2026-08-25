@@ -71,7 +71,7 @@ export default function Home() {
       <div className="card-overlay">
         <div className="card">
         <div className="header">
-          <div className="logo">📒</div>
+          <div className="logo">R</div>
           <div className="header-text">
             <h1>Sales Ledger to Sheet</h1>
             <p className="subtitle">Upload a daily ledger photo. Gemini reads it, rows fill in your Google Sheet.</p>
@@ -92,7 +92,6 @@ export default function Home() {
             </>
           ) : (
             <div className="drop-empty">
-              <div className="drop-icon">📄</div>
               <div className="drop-title">Drop a ledger photo</div>
               <div className="drop-hint">or click to browse</div>
             </div>
@@ -120,12 +119,12 @@ export default function Home() {
             {status.result?.entries && (
               <div className="result-table">
                 <div className="result-header">
-                  <span>#</span>
-                  <span>Customer</span>
-                  <span>Gemini read</span>
-                  <span>Written</span>
-                  <span>Amount</span>
-                  <span>Status</span>
+                  <span className="rg-num">#</span>
+                  <span className="rg-name">Customer</span>
+                  <span className="rg-gemini">Gemini read</span>
+                  <span className="rg-written">Written</span>
+                  <span className="rg-amount">Amount</span>
+                  <span className="rg-status">Status</span>
                 </div>
                 {status.result.entries.map((e, i) => {
                   const w = status.result.written?.[i];
