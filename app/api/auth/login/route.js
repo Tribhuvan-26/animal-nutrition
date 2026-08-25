@@ -1,4 +1,4 @@
-import { APP_PASSWORD, DEMO_PASSWORD, AUTH_COOKIE, AUTH_COOKIE_VALUE, SESSION_DURATION_SECONDS } from '@/app/auth/constants';
+import { APP_PASSWORD, AUTH_COOKIE, AUTH_COOKIE_VALUE, SESSION_DURATION_SECONDS } from '@/app/auth/constants';
 
 export const runtime = 'nodejs';
 
@@ -10,8 +10,7 @@ export async function POST(req) {
     return Response.json({ ok: false, error: 'Invalid request' }, { status: 400 });
   }
 
-  const ok = body?.password === APP_PASSWORD || body?.password === DEMO_PASSWORD;
-  if (!ok) {
+  if (!body?.password || body.password !== APP_PASSWORD) {
     return Response.json({ ok: false, error: 'Incorrect password' }, { status: 401 });
   }
 

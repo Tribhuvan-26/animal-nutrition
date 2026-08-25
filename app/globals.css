@@ -1379,7 +1379,7 @@ h1, .login-title, .drop-title {
   .card, .login-card { background: var(--paper); }
 }
 
-/* ---- Kit bits: colour chips, wordmark badge, demo affordance ---- */
+/* ---- Kit bits: colour chips, wordmark badge ---- */
 
 /* Replaces the wave emoji: three outlined chips, straight off the kit sheet. */
 .login-chips {
@@ -1414,32 +1414,6 @@ h1, .login-title, .drop-title {
   font-size: 1.3rem;
   font-weight: 800;
   line-height: 1;
-}
-
-.login-demo {
-  align-self: center;
-  background: var(--teal);
-  color: var(--ink);
-  border: var(--edge) solid var(--ink);
-  border-radius: var(--radius-sm);
-  box-shadow: 3px 3px 0 var(--ink);
-  padding: 7px 14px;
-  font: inherit;
-  font-size: 0.74rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  cursor: pointer;
-  transition: transform var(--press), box-shadow var(--press);
-}
-
-.login-demo:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 5px 5px 0 var(--ink);
-}
-
-.login-demo:active {
-  transform: translate(3px, 3px);
-  box-shadow: 0 0 0 var(--ink);
 }
 
 /* Sentence case reads calmer than the shouty caps this layer started with. */
@@ -1568,8 +1542,6 @@ h1, .login-title, .drop-title {
     font-size: 0.9rem;
     letter-spacing: 0.04em;
   }
-
-  .login-demo { font-size: 0.7rem; padding: 6px 12px; }
 
   /* Softer offsets so shadows don't collide with the viewport edge. */
   .card, .login-card { box-shadow: 5px 5px 0 var(--ink); }

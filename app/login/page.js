@@ -147,14 +147,6 @@ export default function LoginPage() {
             {loading ? <><span className="spinner" /> Signing in…</> : <>Sign in <span className="login-arrow">→</span></>}
           </SpecularButton>
 
-          <button
-            type="button"
-            className="login-demo cursor-target"
-            onClick={() => setPassword('demo1234')}
-          >
-            Use demo password
-          </button>
-
           <p className="login-hint">
             Press <kbd>Enter</kbd> to sign in · session lasts 7 days
           </p>
