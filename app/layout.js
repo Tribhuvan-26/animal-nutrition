@@ -1,14 +1,18 @@
 import './globals.css';
+import SplashIntro from '@/app/components/SplashIntro';
 
 export const metadata = {
-  title: 'Receipt to Sheet',
+  title: 'Rudra — Sales Ledger to Sheet',
   description: 'Upload a receipt photo, it logs to your Google Sheet.',
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <SplashIntro />
+        {children}
+      </body>
     </html>
   );
 }
