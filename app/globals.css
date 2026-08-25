@@ -1075,3 +1075,473 @@ h1 {
 
 .click-prompt { color: #6f7d92; }
 .found-message { color: #c4b5fd; }
+
+/* =================================================================
+   NEO-BRUTALISM
+   Everything above was glass: blur, gradient, soft shadow, round
+   corners. This layer flattens it - hard borders, offset solid
+   shadows, zero radius, zero blur. Cascade order does the work, so
+   the layout above stays and only the material changes.
+   ================================================================= */
+
+/* Nothing is frosted, nothing is round, nothing glows. */
+.card, .login-card, .dropzone, .status, .result-table, .result-header,
+.result-row-grid, .diag-pill, .login-input, .login-input-wrap, .masonry-item,
+.preview, .login-note, .login-error, .footer, .login-swap, .specular-button,
+.submit-btn, .login-button, .logout-btn, .clear-btn, .login-toggle, .login-badge {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-radius: var(--radius) !important;
+  text-shadow: none;
+}
+
+/* Soft-glow layers have no place here. */
+.login-aurora,
+.login-card::before,
+.login-card::after,
+.login-bg::after,
+.card-overlay::before {
+  display: none;
+}
+
+/* ---- Surfaces ---- */
+
+.card, .login-card {
+  background: var(--paper);
+  border: var(--edge) solid var(--ink);
+  box-shadow: var(--brut-lg);
+}
+
+.card-overlay > .card { background: var(--paper); }
+
+/* ---- Type: loud, tight, uppercase ---- */
+
+h1, .login-title, .drop-title {
+  font-family: "Helvetica Neue", Inter, Arial, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+}
+
+.subtitle, .login-subtitle, .drop-hint, .login-hint, .footer {
+  color: var(--ink-dim);
+}
+
+.login-eyebrow, .diag-pill, .result-header, .login-hint, .drop-hint {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-weight: 700;
+  font-size: 0.66rem;
+}
+
+.login-eyebrow { color: var(--accent); }
+
+.header-text h1 { color: var(--ink); }
+
+/* Accent slab behind the badge instead of a soft glow ring. */
+.login-badge {
+  background: var(--yellow);
+  border: var(--edge) solid var(--ink);
+  box-shadow: 4px 4px 0 var(--ink);
+}
+
+/* ---- Controls: border + offset shadow, press = shadow collapses ---- */
+
+.submit-btn, .login-button, .logout-btn, .clear-btn, .login-toggle,
+.specular-button.login-specular {
+  background: var(--accent);
+  color: var(--paper);
+  border: var(--edge) solid var(--ink) !important;
+  box-shadow: var(--brut) !important;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  transition: transform var(--press), box-shadow var(--press);
+}
+
+.logout-btn, .login-toggle, .clear-btn {
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 3px 3px 0 var(--ink) !important;
+}
+
+.logout-btn:hover { background: var(--coral) !important; color: var(--paper) !important; }
+.login-toggle:hover { background: var(--purple) !important; color: var(--ink) !important; }
+.clear-btn:hover { background: var(--coral) !important; color: var(--paper) !important; }
+
+.submit-btn:hover:not(:disabled), .login-button:hover:not(:disabled),
+.logout-btn:hover, .clear-btn:hover, .login-toggle:hover,
+.specular-button.login-specular:not(:disabled):hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--brut-lg) !important;
+  background: var(--accent);
+  color: var(--paper);
+}
+
+.submit-btn:active:not(:disabled), .login-button:active:not(:disabled),
+.logout-btn:active, .clear-btn:active, .login-toggle:active,
+.specular-button.login-specular:not(:disabled):active {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 var(--ink) !important;
+}
+
+.submit-btn:disabled, .login-button:disabled,
+.specular-button.login-specular:disabled {
+  background: var(--paper-2);
+  color: var(--ink-dim);
+  box-shadow: 3px 3px 0 var(--ink-dim) !important;
+  opacity: 1;
+}
+
+/* SpecularButton keeps its rim animation; the frame above makes it fit. */
+.specular-button.login-specular { --sb-text-color: var(--paper); }
+.specular-button.login-specular .specular-button__fx { opacity: 0.55; }
+
+.login-arrow { transition: transform var(--press); }
+
+/* ---- Inputs ---- */
+
+.login-input-wrap {
+  background: var(--paper);
+  border: var(--edge) solid var(--ink);
+}
+
+.login-input-wrap:focus-within { box-shadow: var(--brut); }
+
+.login-input {
+  background: transparent;
+  border: none !important;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.login-input::placeholder {
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.8rem;
+}
+
+/* ---- Dropzone: dashed until you drag, then it slams solid ---- */
+
+.dropzone {
+  background: var(--paper-2);
+  border: var(--edge) dashed var(--ink);
+  box-shadow: none;
+}
+
+.dropzone:hover { background: var(--yellow); border-style: dashed; }
+
+.drop-title { text-transform: none; }
+
+.dropzone.dragging {
+  background: var(--teal);
+  border-style: solid;
+  box-shadow: var(--brut);
+  transform: none;
+}
+
+.dropzone.has-preview { background: var(--paper); border-style: solid; }
+
+.preview { border: var(--edge) solid var(--ink); }
+
+/* ---- Status / results / diagnostics ---- */
+
+.status {
+  background: var(--paper);
+  border: var(--edge) solid var(--ink);
+  box-shadow: var(--brut);
+}
+
+.status.success { background: var(--teal); }
+.status.error   { background: var(--accent); color: var(--paper); }
+.status.loading { background: var(--yellow); }
+
+.status-message { color: inherit; font-weight: 700; }
+
+.result-table { border: var(--edge) solid var(--ink); background: var(--paper); }
+
+.result-header {
+  background: var(--ink);
+  color: var(--paper);
+  border: none;
+}
+
+.result-row-grid { border-top: 2px solid var(--ink); background: var(--paper); }
+.result-row-grid:hover { background: var(--purple); }
+.result-row-grid span, .rg-num, .rg-status { color: var(--ink); }
+.rg-gemini { color: var(--ink-dim); }
+.rg-written { color: var(--ink); font-weight: 700; }
+
+.diag-pill {
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  border-radius: var(--radius-sm);
+  color: var(--ink);
+}
+
+.diag-pill b.ok  { color: var(--ink); background: var(--teal); padding: 0 4px; }
+.diag-pill b.bad { color: var(--paper); background: var(--accent); padding: 0 4px; }
+
+.diag-error {
+  background: var(--accent);
+  color: var(--paper);
+  border: 2px solid var(--ink);
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+}
+
+.login-error {
+  background: var(--accent);
+  color: var(--paper);
+  border: var(--edge) solid var(--ink);
+  box-shadow: 4px 4px 0 var(--ink);
+  font-weight: 700;
+}
+
+.login-note {
+  background: var(--yellow);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  font-weight: 700;
+}
+
+.login-hint kbd {
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  border-radius: var(--radius-sm);
+  box-shadow: 2px 2px 0 var(--ink);
+  color: var(--ink);
+  padding: 1px 5px;
+  font-weight: 800;
+}
+
+.spinner {
+  border: 3px solid var(--ink);
+  border-top-color: transparent;
+  border-radius: 50%;   /* the one round thing; a square spinner reads as broken */
+}
+
+/* ---- Photo wall: printed contact sheet, not a soft collage ---- */
+
+.masonry-item {
+  border: var(--edge) solid var(--ink);
+  border-radius: var(--radius-sm);
+  box-shadow: 5px 5px 0 var(--ink);
+  /* full colour — the kit is built on colour, desaturating fought it */
+  filter: saturate(1.1);
+}
+
+.masonry-item:hover { filter: saturate(1.25); }
+
+.login-bg { opacity: 0.5; }
+
+/* ---- Pixel layers ---- */
+
+.click-prompt {
+  background: var(--ink);
+  color: var(--paper);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-weight: 800;
+}
+
+.found-message {
+  background: var(--accent);
+  color: var(--paper);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-weight: 800;
+}
+
+.login-swap { border-top: var(--edge) solid var(--ink); }
+
+/* ---- Footer / focus ---- */
+
+.footer { border-top: var(--edge) solid var(--ink); background: transparent; }
+
+.footer a {
+  color: var(--ink);
+  font-weight: 800;
+  text-decoration: underline 3px var(--accent);
+}
+
+.footer a:hover { background: var(--accent); color: var(--paper); }
+
+:focus-visible {
+  outline: var(--edge) solid var(--ink);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Brutalism is already high-contrast; just make sure nothing softens it. */
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  .card, .login-card { background: var(--paper); }
+}
+
+/* ---- Kit bits: colour chips, wordmark badge, demo affordance ---- */
+
+/* Replaces the wave emoji: three outlined chips, straight off the kit sheet. */
+.login-chips {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 1.1rem;
+}
+
+.chip {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+}
+
+.chip-coral  { background: var(--coral); }
+.chip-purple { background: var(--purple); }
+.chip-teal   { background: var(--teal); }
+
+/* Wordmark tile instead of the notebook emoji. */
+.logo {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  background: var(--coral);
+  color: var(--paper);
+  border: var(--edge) solid var(--ink);
+  border-radius: var(--radius-sm);
+  box-shadow: 3px 3px 0 var(--ink);
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 1.3rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.login-demo {
+  align-self: center;
+  background: var(--teal);
+  color: var(--ink);
+  border: var(--edge) solid var(--ink);
+  border-radius: var(--radius-sm);
+  box-shadow: 3px 3px 0 var(--ink);
+  padding: 7px 14px;
+  font: inherit;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: transform var(--press), box-shadow var(--press);
+}
+
+.login-demo:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0 var(--ink);
+}
+
+.login-demo:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 var(--ink);
+}
+
+/* Sentence case reads calmer than the shouty caps this layer started with. */
+.login-title, .drop-title, .header-text h1 { text-transform: none; }
+.login-subtitle, .subtitle { text-transform: none; letter-spacing: 0; }
+
+/* ---- Login backdrop: the kit's own furniture ----
+   Cream alone was flat. Two pastel slabs anchor opposite corners, dot clusters
+   fill the dead space, and outlined shapes drift between them. Behind the card
+   (z-index 4), above the photo wall (0). */
+
+.login-deco {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Big colour blocks, bled off the edge so they read as panels not stickers. */
+.deco-slab {
+  position: absolute;
+  border: var(--edge) solid var(--ink);
+  border-radius: 26px;
+}
+
+.slab-pink {
+  width: 42vw;
+  height: 46vh;
+  left: -12vw;
+  bottom: -14vh;
+  background: var(--paper-2);
+  transform: rotate(-4deg);
+}
+
+.slab-yellow {
+  width: 34vw;
+  height: 40vh;
+  right: -10vw;
+  top: -12vh;
+  background: var(--yellow);
+  transform: rotate(5deg);
+}
+
+/* Printed dot clusters, straight off the kit sheet. */
+.deco-dots {
+  position: absolute;
+  width: 118px;
+  height: 90px;
+  background-image: radial-gradient(var(--coral) 2.4px, transparent 2.6px);
+  background-size: 17px 17px;
+  opacity: 0.55;
+}
+
+.dots-a { left: 5vw; top: 12vh; }
+.dots-b { right: 7vw; bottom: 14vh; background-image: radial-gradient(var(--purple) 2.4px, transparent 2.6px); }
+
+/* ---- Scattered shapes: outlined, hard-shadowed, slowly drifting ---- */
+
+.deco {
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  border: var(--edge) solid var(--ink);
+  border-radius: 6px;
+  box-shadow: 3px 3px 0 var(--ink);
+  animation: decoFloat 11s ease-in-out infinite alternate;
+}
+
+/* Circles and diamonds out of the same box — no extra markup. */
+.cir-teal, .cir-purple { border-radius: 50%; }
+.dia-purple, .dia-coral, .dia-yellow { border-radius: 3px; rotate: 45deg; }
+
+.sq-coral   { background: var(--coral);  left: 14vw; top: 26vh; animation-delay: -1s; }
+.dia-purple { background: var(--purple); left: 22vw; bottom: 22vh; animation-delay: -3s; }
+.cir-teal   { background: var(--teal);   left: 9vw;  bottom: 38vh; animation-delay: -5s; }
+.sq-yellow  { background: var(--yellow); right: 15vw; top: 30vh; animation-delay: -2s; }
+.dia-coral  { background: var(--coral);  right: 22vw; bottom: 26vh; animation-delay: -6s; }
+.cir-purple { background: var(--purple); right: 10vw; bottom: 42vh; animation-delay: -4s; }
+.sq-teal    { background: var(--teal);   left: 30vw; top: 12vh; animation-delay: -7s; }
+.dia-yellow { background: var(--yellow); right: 30vw; bottom: 10vh; animation-delay: -8s; }
+
+@keyframes decoFloat {
+  from { translate: 0 0; }
+  to   { translate: 0 -16px; }
+}
+
+/* Photo wall was tuned for the old dark theme — blurred and darkened it turned
+   to grey mud on cream. Light touch instead: a soft colour texture. */
+.login-bg {
+  filter: blur(3px) saturate(1.15) brightness(1.04);
+  opacity: 0.3 !important;
+}
+
+@media (max-width: 767px) {
+  /* Fewer shapes on a phone; the slabs and two dot clusters carry it. */
+  .sq-teal, .dia-yellow, .cir-purple, .dia-coral { display: none; }
+  .deco { width: 20px; height: 20px; }
+  .slab-pink { width: 62vw; }
+  .slab-yellow { width: 55vw; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .deco { animation: none; }
+}
