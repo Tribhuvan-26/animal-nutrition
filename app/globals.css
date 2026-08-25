@@ -1545,3 +1545,138 @@ h1, .login-title, .drop-title {
 @media (prefers-reduced-motion: reduce) {
   .deco { animation: none; }
 }
+
+/* ---- Mobile reconciliation ----
+   The kit layers above are appended after the responsive blocks, so on equal
+   specificity they were winning and silently killing the small-screen sizes.
+   These have to come last to take effect. */
+
+@media (max-width: 768px) {
+  /* Wordmark tile: the kit set 44px unconditionally and beat the 40px above. */
+  .logo {
+    width: 38px;
+    height: 38px;
+    font-size: 1.1rem;
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+
+  .diag-pill { font-size: 0.62rem; padding: 0.25rem 0.5rem; }
+
+  /* Full-bleed submit inside a narrow card: lg padding was pushing it wide. */
+  .specular-button.login-specular {
+    padding: 0.85rem 1rem;
+    font-size: 0.9rem;
+    letter-spacing: 0.04em;
+  }
+
+  .login-demo { font-size: 0.7rem; padding: 6px 12px; }
+
+  /* Softer offsets so shadows don't collide with the viewport edge. */
+  .card, .login-card { box-shadow: 5px 5px 0 var(--ink); }
+  .login-error, .status { box-shadow: 3px 3px 0 var(--ink); }
+
+  /* Long customer names must ellipsis, not push the grid out of alignment. */
+  .result-row-grid span, .result-header span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Backdrop furniture scales down rather than crowding the card. */
+  .deco-dots { width: 80px; height: 62px; background-size: 14px 14px; }
+  .login-bg { opacity: 0.18 !important; }
+}
+
+@media (max-width: 480px) {
+  .login-card { padding: 1.85rem 1.15rem 1.4rem; }
+  .login-title { font-size: 1.2rem; }
+  .login-chips { margin-bottom: 0.85rem; }
+  .chip { width: 13px; height: 13px; }
+
+  /* Two slabs at phone width read as clutter behind a full-width card. */
+  .slab-yellow { display: none; }
+  .slab-pink { width: 76vw; height: 34vh; }
+  .dots-b { display: none; }
+
+  .footer { font-size: 0.68rem; }
+}
+
+/* ---- Fixes found in the mobile pass ---- */
+
+/* The base sheet styles the field as `.login-input-wrap .login-input`, which
+   outranks a bare `.login-input` no matter how late it appears. Match the
+   specificity or the old dark slate keeps winning. */
+.login-input-wrap .login-input {
+  background: transparent;
+  color: var(--ink);
+  border: none;
+}
+
+.login-input-wrap .login-input::placeholder {
+  color: var(--ink-dim);
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+
+/* SpecularButton's canvas is inset -20px over the whole control, so its grey
+   rim wash sat on top of the coral fill and greyed the label out. The frame
+   below carries the button now; the canvas only fought the flat palette. */
+.specular-button.login-specular .specular-button__fx { display: none; }
+
+.specular-button.login-specular {
+  background: var(--coral);
+  color: var(--paper);
+}
+
+.specular-button.login-specular .specular-button__label {
+  color: var(--paper);
+  position: relative;
+  z-index: 2;
+}
+
+/* Body copy, not a label — it was caught in the eyebrow uppercase group. */
+.login-hint {
+  text-transform: none;
+  letter-spacing: 0.01em;
+  font-weight: 500;
+  font-size: 0.72rem;
+}
+
+.login-hint kbd {
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* Footer strip reads calmer in sentence case at this size. */
+.click-prompt, .found-message {
+  text-transform: none;
+  letter-spacing: 0.02em;
+  font-weight: 700;
+}
+
+/* ---- State colours the base sheet still owned ---- */
+
+/* `.dropzone:hover` outranks a bare `.dropzone`, so the old indigo border
+   survived every flat-palette rule above it. States have to be restated. */
+.dropzone,
+.dropzone:hover,
+.dropzone:active,
+.dropzone.dragging,
+.dropzone.has-preview {
+  border-width: var(--edge);
+  border-color: var(--ink);
+}
+
+.dropzone:hover { background: var(--yellow); }
+.dropzone.dragging { background: var(--teal); border-style: solid; }
+.dropzone.has-preview { background: var(--paper); border-style: solid; }
+
+/* Disabled was reusing the pink slab colour, which reads as an enabled pastel
+   button. Inert grey-cream instead, so coral means "you can press this". */
+.submit-btn:disabled,
+.login-button:disabled,
+.specular-button.login-specular:disabled {
+  background: #e6e0d4;
+  color: #8a837c;
+  box-shadow: 3px 3px 0 #b8b1a6 !important;
+}
