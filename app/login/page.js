@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import TextCursor from '@/app/components/TextCursor';
 import PhotoMasonry from '@/app/components/PhotoMasonry';
 import BlurText from '@/app/components/BlurText';
-import DotField from '@/app/components/DotField';
+import SpecularButton from '@/app/components/SpecularButton';
+import PixelSwap from '@/app/components/PixelSwap';
+import TargetCursor from '@/app/components/TargetCursor';
 
 export default function LoginPage() {
   const [password, setPassword] = useState('');
@@ -13,18 +14,15 @@ export default function LoginPage() {
   const [capsOn, setCapsOn] = useState(false);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [calm, setCalm] = useState(false);   // reduced motion → skip the canvas entirely
   const [wide, setWide] = useState(false);   // photo wall is desktop-only
   const router = useRouter();
 
   useEffect(() => {
-    const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const width = window.matchMedia('(min-width: 768px)');
-    const sync = () => { setCalm(motion.matches); setWide(width.matches); };
+    const sync = () => setWide(width.matches);
     sync();
-    motion.addEventListener('change', sync);
     width.addEventListener('change', sync);
-    return () => { motion.removeEventListener('change', sync); width.removeEventListener('change', sync); };
+    return () => width.removeEventListener('change', sync);
   }, []);
 
   async function handleSubmit(e) {
@@ -60,34 +58,38 @@ export default function LoginPage() {
         </div>
       )}
 
-      {/* Drifting colour, then the React Bits dot field on top of it. */}
-      <div className="login-aurora" aria-hidden="true">
-        <span className="aurora-blob b1" />
-        <span className="aurora-blob b2" />
-        <span className="aurora-blob b3" />
-      </div>
-
-      {!calm && (
-        <div className="login-dots" aria-hidden="true">
-          <DotField
-            dotSpacing={wide ? 18 : 22}
-            dotRadius={2.4}
-            cursorRadius={wide ? 420 : 260}
-            bulgeStrength={wide ? 62 : 34}
-            waveAmplitude={1.6}
-            glowRadius={220}
-            glowColor="#241f5c"
-            gradientFrom="rgba(180, 190, 255, 0.6)"
-            gradientTo="rgba(196, 132, 252, 0.42)"
-          />
-        </div>
+      {wide && (
+        <TargetCursor
+          spinDuration={2}
+          hideDefaultCursor
+          parallaxOn
+          hoverDuration={0.2}
+          cursorColor="#ffffff"
+          cursorColorOnTarget="#ff5a1f"
+        />
       )}
 
-      {wide && <TextCursor emoji="💪" spacing={80} trailLength={6} fadeMs={900} size="2rem" />}
+      {/* Kit furniture: pastel slabs, dot clusters, scattered outlined shapes. */}
+      <div className="login-deco" aria-hidden="true">
+        <span className="deco-slab slab-pink" />
+        <span className="deco-slab slab-yellow" />
+        <span className="deco-dots dots-a" />
+        <span className="deco-dots dots-b" />
+        <span className="deco sq-coral" />
+        <span className="deco dia-purple" />
+        <span className="deco cir-teal" />
+        <span className="deco sq-yellow" />
+        <span className="deco dia-coral" />
+        <span className="deco cir-purple" />
+        <span className="deco sq-teal" />
+        <span className="deco dia-yellow" />
+      </div>
 
       <div className="login-card">
-        <div className="login-badge">
-          <span className="login-emoji">👋</span>
+        <div className="login-chips" aria-hidden="true">
+          <span className="chip chip-coral" />
+          <span className="chip chip-purple" />
+          <span className="chip chip-teal" />
         </div>
 
         <p className="login-eyebrow">Welcome back</p>
@@ -98,7 +100,6 @@ export default function LoginPage() {
 
         <form className="login-form" onSubmit={handleSubmit}>
           <div className="login-input-wrap">
-            <span className="login-lock" aria-hidden="true">🔒</span>
             <input
               type={showPassword ? 'text' : 'password'}
               placeholder="Password"
@@ -107,11 +108,11 @@ export default function LoginPage() {
               onKeyUp={(e) => setCapsOn(e.getModifierState?.('CapsLock') ?? false)}
               autoFocus
               required
-              className="login-input"
+              className="login-input cursor-target"
             />
             <button
               type="button"
-              className="login-toggle"
+              className="login-toggle cursor-target"
               onClick={() => setShowPassword((v) => !v)}
               aria-label={showPassword ? 'Hide password' : 'Show password'}
             >
@@ -122,8 +123,36 @@ export default function LoginPage() {
           {capsOn && <div className="login-note">⇪ Caps Lock is on</div>}
           {error && <div className="login-error" role="alert">{error}</div>}
 
-          <button type="submit" disabled={loading || !password} className="login-button">
+          <SpecularButton
+            type="submit"
+            size="lg"
+            radius={18}
+            tint="#ffffff"
+            tintOpacity={0}
+            blur={0}
+            textColor="#f5f5f5"
+            lineColor="#ffffff"
+            baseColor="#525252"
+            intensity={1}
+            shineSize={10}
+            shineFade={40}
+            thickness={1}
+            speed={0.35}
+            followMouse
+            proximity={250}
+            autoAnimate={false}
+            disabled={loading || !password}
+            className="login-specular cursor-target"
+          >
             {loading ? <><span className="spinner" /> Signing in…</> : <>Sign in <span className="login-arrow">→</span></>}
+          </SpecularButton>
+
+          <button
+            type="button"
+            className="login-demo cursor-target"
+            onClick={() => setPassword('demo1234')}
+          >
+            Use demo password
           </button>
 
           <p className="login-hint">
@@ -131,7 +160,32 @@ export default function LoginPage() {
           </p>
         </form>
 
-        <p className="login-foot">Private ledger · Gemini 2.5 Flash → Google Sheets</p>
+        <div className="login-swap cursor-target">
+          <PixelSwap
+            firstContent={
+              <div className="click-prompt">
+                <span>Private ledger · Gemini 2.5 Flash → Google Sheets</span>
+              </div>
+            }
+            secondContent={
+              <div className="found-message">
+                <span>You found me</span>
+              </div>
+            }
+            pixelSize={wide ? 64 : 26}
+            gap={0}
+            pixelRadius={0}
+            pixelSpin={0}
+            pixelScale={0.35}
+            duration={1400}
+            pixelDuration={450}
+            pattern="random"
+            randomness={0}
+            fade
+            trigger="hover"
+            aspectRatio="8 / 1"
+          />
+        </div>
       </div>
     </main>
   );
