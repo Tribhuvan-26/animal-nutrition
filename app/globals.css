@@ -5,27 +5,34 @@
 }
 
 :root {
-  --ink: #f1f5f9;
-  --ink-dim: #a6b3c6;      /* vibrancy: lifted from #94a3b8 for text over glass */
-  --accent: #6366f1;
-  --accent-2: #8b5cf6;
-  --glass: rgba(12, 18, 34, 0.72);
-  --hairline: rgba(255, 255, 255, 0.12);
-  --press: 100ms ease-out;                          /* press feedback: instant */
-  --settle: 380ms cubic-bezier(0.22, 1, 0.36, 1);   /* critically damped, response ~0.4 */
+  /* Palette lifted from the Neo Brutalism UI kit: cream ground, pastel fills,
+     near-black outline. Soft colours, hard edges. */
+  --paper: #fdf6ec;
+  --paper-2: #f8cfc8;      /* the pink panel */
+  --ink: #1a1a1a;
+  --ink-dim: #6b6560;
+  --coral: #f0555c;
+  --purple: #a78bf5;
+  --teal: #4ecdc4;
+  --yellow: #fde36a;
+  --accent: var(--coral);
+  --accent-2: var(--purple);
+  --hairline: var(--ink);
+  --edge: 2px;             /* the kit outlines thin, not heavy */
+  --radius: 12px;          /* rounded, not sharp — see the kit's cards */
+  --radius-sm: 8px;
+  --brut: 4px 4px 0 var(--ink);
+  --brut-lg: 7px 7px 0 var(--ink);
+  --press: 60ms steps(2);
+  --settle: 120ms cubic-bezier(0.2, 0, 0, 1);
 }
 
 html, body {
   height: 100%;
-  font: 100%/1.5 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI Variable Text", "Segoe UI", Roboto, sans-serif;
-  background:
-    radial-gradient(80vw 60vh at 15% -10%, rgba(99, 102, 241, 0.18), transparent 70%),
-    radial-gradient(70vw 55vh at 90% 110%, rgba(168, 85, 247, 0.16), transparent 70%),
-    linear-gradient(180deg, #070b16 0%, #0d1424 55%, #0a1020 100%);
-  background-attachment: fixed;
+  font: 100%/1.45 "Helvetica Neue", Inter, "Segoe UI Variable Text", "Segoe UI", Arial, sans-serif;
+  background-color: var(--paper);
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
 }
 
 :focus-visible {
@@ -171,12 +178,6 @@ h1 {
 .drop-empty {
   text-align: center;
   padding: 2rem;
-}
-
-.drop-icon {
-  font-size: 2.5rem;
-  margin-bottom: 0.5rem;
-  filter: grayscale(0.4);
 }
 
 .drop-title {
@@ -387,21 +388,6 @@ h1 {
   font-size: 0.72rem;
 }
 
-/* ---- React Bits DotField layer ---- */
-
-.dot-field-container {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-.login-dots {
-  position: fixed;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-}
-
 /* ---- Aurora colour layer ---- */
 
 .login-aurora {
@@ -558,22 +544,6 @@ h1 {
   margin-bottom: 0.35rem;
 }
 
-.login-emoji {
-  font-size: 2rem;
-  line-height: 1;
-  animation: wave 1.8s ease-in-out infinite;
-  transform-origin: 70% 70%;
-  display: inline-block;
-}
-
-@keyframes wave {
-  0%, 60%, 100% { transform: rotate(0deg); }
-  10% { transform: rotate(14deg); }
-  20% { transform: rotate(-8deg); }
-  30% { transform: rotate(14deg); }
-  40% { transform: rotate(-4deg); }
-  50% { transform: rotate(10deg); }
-}
 
 .login-title {
   font-size: clamp(1.9rem, 5vw, 2.4rem);
@@ -815,28 +785,6 @@ h1 {
   will-change: filter, opacity, transform;
 }
 
-/* ---- Text cursor trail ---- */
-
-.text-cursor-layer {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 9999;
-  overflow: hidden;
-}
-
-.text-cursor-emoji {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  animation: cursorFade var(--fade-ms, 700ms) ease-out forwards;
-  filter: drop-shadow(0 4px 12px rgba(99, 102, 241, 0.35));
-  user-select: none;
-}
-
-@keyframes cursorFade {
-  0%   { opacity: 1;   transform: translate(-50%, -50%) scale(1)   rotate(-6deg); }
-  100% { opacity: 0;   transform: translate(-50%, -120%) scale(0.4) rotate(12deg); }
-}
 
 /* ---- Footer ---- */
 
@@ -922,16 +870,14 @@ h1 {
     font-size: 0.9rem;
   }
 
-  /* Compact result table — hide Gemini column on mobile to fit */
+  /* Compact result table: drop the Gemini column, five left. Header and rows
+     share the rg-* classes so both halves hide together and stay aligned. */
   .result-header, .result-row-grid {
-    grid-template-columns: 1.2rem 4.5rem 1fr 3rem 3.5rem;
+    grid-template-columns: 1.2rem minmax(0, 1fr) minmax(0, 1fr) 3rem 3.5rem;
     gap: 0.3rem;
     font-size: 0.72rem;
   }
-  .result-header .rg-gemini-col,
-  .result-row-grid .rg-gemini {
-    display: none;
-  }
+  .rg-gemini { display: none; }
 
   .diag-pill {
     font-size: 0.62rem;
@@ -943,10 +889,6 @@ h1 {
     padding: 2.25rem 1.5rem 1.75rem;
     max-width: calc(100vw - 1.5rem);
     border-radius: 20px;
-  }
-
-  .login-emoji {
-    font-size: 2.5rem;
   }
 
   .login-title {
@@ -964,10 +906,6 @@ h1 {
     font-size: 0.9rem;
   }
 
-  /* Reduce cursor emoji size on small screens */
-  .text-cursor-emoji {
-    font-size: 1.3rem !important;
-  }
 }
 
 @media (max-width: 480px) {
@@ -987,14 +925,11 @@ h1 {
     font-size: 0.72rem;
   }
 
-  /* Hide Gemini-read and amount/status separation gracefully */
+  /* Narrowest: name, amount, status. Written goes too — four columns, four cells. */
   .result-header, .result-row-grid {
-    grid-template-columns: 1rem 1fr 2.8rem 3rem;
+    grid-template-columns: 1rem minmax(0, 1fr) 2.8rem 3rem;
   }
-  .result-header > span:nth-child(3),
-  .result-row-grid > span:nth-child(3) {
-    display: none;
-  }
+  .rg-written { display: none; }
 
   .footer {
     font-size: 0.68rem;
@@ -1016,8 +951,6 @@ h1 {
   .submit-btn:hover:not(:disabled), .submit-btn:active:not(:disabled),
   .login-button:hover:not(:disabled), .login-button:active:not(:disabled),
   .logout-btn:active { transform: none; }
-  .login-emoji { animation: none; }
-  .text-cursor-layer { display: none; }
 }
 
 @keyframes fadeOnly {
@@ -1026,19 +959,13 @@ h1 {
 }
 
 @media (prefers-reduced-transparency: reduce) {
-  .card, .login-card {
-    background: #0d1424;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-  }
-  .card-overlay::before { background: rgba(6, 10, 20, 0.85); }
-  .clear-btn { backdrop-filter: none; background: rgba(0, 0, 0, 0.8); }
+  .card, .login-card { background: var(--paper); }
+  .clear-btn { background: var(--paper); }
 }
 
 @media (prefers-contrast: more) {
-  :root { --ink-dim: #cbd5e1; --hairline: rgba(255, 255, 255, 0.4); }
-  .card, .login-card { background: #080d18; backdrop-filter: none; }
-  .dropzone { border-color: #94a3b8; }
+  :root { --ink-dim: #2e2a26; --hairline: var(--ink); }
+  .dropzone { border-color: var(--ink); }
 }
 
 /* ---- Login: inline note + footer ---- */
@@ -1078,16 +1005,8 @@ h1 {
    ============================================ */
 
 @media (max-width: 767px) {
-  /* Photo wall is desktop-only (also gated in login/page.js), the dot field
-     plus the gradient field carries the small screens. */
+  /* Photo wall is desktop-only (also gated in login/page.js). */
   .login-bg { display: none; }
-
-  .login-dots {
-    /* Vignette so the dots read as depth, not as texture fighting the card. */
-    mask-image: radial-gradient(ellipse 120% 90% at 50% 40%, #000 35%, transparent 100%);
-    -webkit-mask-image: radial-gradient(ellipse 120% 90% at 50% 40%, #000 35%, transparent 100%);
-    opacity: 0.85;
-  }
 
   .login-card {
     /* Slightly denser glass: less to blur behind it on a phone. */
@@ -1120,11 +1039,39 @@ h1 {
   color: #cbd5e1;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .aurora-blob { animation: none; }
-}
-
 @media (prefers-reduced-transparency: reduce) {
   .login-aurora { display: none; }
   .login-card::after { display: none; }
 }
+
+/* ---- React Bits: SpecularButton as the submit control ---- */
+
+.specular-button.login-specular {
+  width: 100%;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 0.9rem 1rem;
+  gap: 0.5rem;
+}
+
+/* ---- React Bits: PixelSwap footer ---- */
+
+.login-swap {
+  margin-top: 1.5rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.click-prompt,
+.found-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-size: 0.72rem;
+  letter-spacing: 0.01em;
+  text-align: center;
+}
+
+.click-prompt { color: #6f7d92; }
+.found-message { color: #c4b5fd; }
