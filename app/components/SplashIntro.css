@@ -1,0 +1,77 @@
+.splash {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* The curtain is bars, not one panel, so the exit is a shutter not a fade. */
+.splash-curtain {
+  position: absolute;
+  inset: 0;
+  display: flex;
+}
+
+.splash-bar {
+  flex: 1 1 0;
+  background: var(--ink, #1a1a1a);
+}
+
+.splash-lockup {
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+  will-change: transform;
+}
+
+/* Front and ghost share one box: the ghost sits behind and kicks out on the hit. */
+.splash-front,
+.splash-ghost {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.02em;
+  font-family: "Arial Black", "Helvetica Neue", Impact, system-ui, sans-serif;
+  font-weight: 900;
+  font-size: clamp(3.4rem, 15vw, 11rem);
+  line-height: 0.82;
+  letter-spacing: -0.045em;
+}
+
+.splash-front {
+  position: relative;
+  color: var(--paper, #fdf6ec);
+}
+
+.splash-ghost {
+  position: absolute;
+  inset: 0;
+  color: var(--coral, #f0555c);
+  z-index: -1;
+  user-select: none;
+}
+
+.splash-letter {
+  display: inline-block;
+  /* letters rise out of nothing — clipped so the offscreen glyph never shows */
+  clip-path: inset(-25% 0 0 0);
+}
+
+.splash-dot,
+.splash-dot-ghost {
+  display: inline-block;
+  width: 0.16em;
+  height: 0.16em;
+  margin-left: 0.06em;
+  margin-bottom: 0.04em;
+  border-radius: 4px;
+  background: var(--coral, #f0555c);
+}
+
+.splash-dot-ghost { background: var(--paper, #fdf6ec); }
+
+@media (prefers-reduced-motion: reduce) {
+  .splash { display: none; }
+}
