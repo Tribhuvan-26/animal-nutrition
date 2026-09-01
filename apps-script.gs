@@ -75,6 +75,7 @@ function doPost(e) {
     const paidDropdown = inspectPaidDropdown();
 
     let { headerRow, nextWriteRow, maxSno } = findOrCreateSection(sheet, dateLabel);
+    ensureSheetSize(sheet, nextWriteRow + payload.entries.length, 10);
 
     const written = [];
     const newItems = [];
