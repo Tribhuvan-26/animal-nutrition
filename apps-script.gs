@@ -435,6 +435,13 @@ function formatDateLabel(isoDate) {
   return `${months[d.getMonth()]} ${d.getDate()}`;
 }
 
+function ensureSheetSize(sheet, minRows, minCols) {
+  const maxRows = sheet.getMaxRows();
+  if (maxRows < minRows) sheet.insertRowsAfter(maxRows, minRows - maxRows);
+  const maxCols = sheet.getMaxColumns();
+  if (maxCols < minCols) sheet.insertColumnsAfter(maxCols, minCols - maxCols);
+}
+
 function findOrCreateSection(sheet, dateLabel) {
   const lastRow = Math.max(sheet.getLastRow(), 1);
   const data = sheet.getRange(1, 1, lastRow, 10).getValues();
