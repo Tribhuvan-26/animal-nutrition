@@ -460,6 +460,7 @@ function findOrCreateSection(sheet, dateLabel) {
 
   if (labelRow === -1) {
     const startAt = lastRow + 3;
+    ensureSheetSize(sheet, startAt + 1, 10);
     const greenColor = findExistingDateRowColor(sheet) || '#00ff00';
     const dateRange = sheet.getRange(startAt, 1, 1, 10);
     dateRange.merge();
