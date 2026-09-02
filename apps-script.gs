@@ -165,7 +165,6 @@ function doPost(e) {
       apiUsed,
       apiError,
       sheetsAvailable,
-      chipFound: !!chipValidationRule,
       apiRequestCount: apiRequests.length,
     });
   } catch (err) {
