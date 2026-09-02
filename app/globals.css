@@ -1255,7 +1255,7 @@ h1, .login-title, .drop-title {
 
 .status.success { background: var(--teal); }
 .status.error   { background: var(--accent); color: var(--paper); }
-.status.loading { background: var(--yellow); }
+.status.loading { background: var(--yellow); color: var(--ink); }
 
 .status-message { color: inherit; font-weight: 700; }
 
