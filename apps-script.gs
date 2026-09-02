@@ -74,6 +74,10 @@ function doPost(e) {
     let masterList = getMasterList(masterSheet);
     const paidDropdown = inspectPaidDropdown();
 
+    // Must run before any getRange(..., 10) reads below (findOrCreateSection,
+    // findExistingDateRowColor) — those throw "coordinates outside dimensions"
+    // if the sheet has fewer than 10 actual columns.
+    ensureSheetSize(sheet, sheet.getLastRow() + payload.entries.length + 5, 10);
     let { headerRow, nextWriteRow, maxSno } = findOrCreateSection(sheet, dateLabel);
     ensureSheetSize(sheet, nextWriteRow + payload.entries.length, 10);
 
