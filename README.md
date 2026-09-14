@@ -1,4 +1,4 @@
-# RUDRA Website for Icu Akka 😃
+# RUDRA Website for Icu Akka 😃 kid
 
 A simple website where you upload a picture of a receipt, and the website automatically adds a new row to your Google Sheet with the **Date**, **Vendor**, and **Total** from the receipt.
 
